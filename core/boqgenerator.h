@@ -40,7 +40,6 @@ struct BOQItem{
 /**
   * BOQCreation class.Takes
   */
-
 class BOQGenerator : public QObject
 {
     Q_OBJECT
