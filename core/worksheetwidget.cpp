@@ -96,6 +96,7 @@ void WorkSheetWidget::addBOQItem(BOQItem &boqItem)
     model->setData(index, boqItem.unitRate);
     index= model->index(currentRow    ,   5, QModelIndex());
     model->setData(index, boqItem.amount);
+    ui->tableView->resizeRowToContents(currentRow);
     currentRow++;
 
     boqData.itemList.append(boqItem);
@@ -199,10 +200,27 @@ void WorkSheetWidget::setupBOQTable()
     ui->tableView->setColumnWidth(3, 100);
     ui->tableView->setColumnWidth(4, 100);
     ui->tableView->setColumnWidth(5, 100);
+    ui->tableView->setItemDelegate(&boqItemDelgate);
+    ui->tableView->horizontalHeader()->setStretchLastSection(true);
+//    ui->tableView->mousePressEvent(QMouseEvent *event);
 
-
+    connect(ui->tableView, SIGNAL(pressed(QModelIndex)), this, SLOT(showPopupMenu(QModelIndex )));
     QStringList headers;
     headers << "Ref No" << "Description"<< "Qty"<< "Unit" << "Rate"<< "Amount";
     model->setHorizontalHeaderLabels(headers);
     ui->tableView->horizontalHeader()->stretchLastSection();
+}
+
+void WorkSheetWidget::showPopupMenu(QModelIndex index)
+{
+//    qDebug() << "row" << index.row();
+//    qDebug() << "col" << index.column() ;
+    Qt::MouseButtons  buttons =  QApplication::mouseButtons();
+    if(buttons == Qt::LeftButton){
+        qDebug()<< "left";
+    }
+    QTreeView *popup = new QTreeView(this);
+
+    popup->header()->hide();
+    popup->show();
 }

@@ -199,7 +199,7 @@ void AddRemoveURC::fillUIData()
     QStringList headers;
     headers << "Name" << "Qty" << "Unit" << "Rate" << "Amount" << "Description";
     resourceTableModel->setHorizontalHeaderLabels(headers);
-
+    ui->URCTableView->horizontalHeader()->setStretchLastSection(true);
     // combo box data
     units = new Units(storageManager, this);
     ui->calcUnitComboBox->addItems(units->getUnits());

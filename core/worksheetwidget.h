@@ -21,6 +21,7 @@
 #include "storage/storagemanager.h"
 #include "core/boqgenerator.h"
 #include "core/CoreStructures.h"
+#include "core/boqdelegate.h"
 
 #include <QDialog>
 #include <QtCore>
@@ -63,20 +64,27 @@ private slots:
 
     void on_ItemEdit_textEdited(const QString &arg1);
 
+    void showPopupMenu(QModelIndex index);
+
 private:
     int indexNum;
+    int currentRow;
+    QSqlQueryModel itemModel, categoryModel;
+    BOQData boqData;
+    BOQDelegate boqItemDelgate;
+
     Ui::WorkSheetWidget *ui;
     StorageManager *storageManager;
     BOQGenerator *boqGenerator;
-    QStandardItemModel *model;
+    QStandardItemModel *model;   
+    QCompleter *itemCompleter, *categoryCompleter;
+
+
     void addBOQItem(BOQItem &boqItem);
-    int currentRow;
     void showError(const QString errorMsg);
     void setupCompleters();
     void setupBOQTable();
-    QCompleter *itemCompleter, *categoryCompleter;
-    QSqlQueryModel itemModel, categoryModel;
-    BOQData boqData;
+
 };
 
 #endif // WORKSHEETWIDGET_H

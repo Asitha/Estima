@@ -28,7 +28,8 @@ HEADERS += addons/printview.h \
            storage/sqlitedbmanager.h \
            storage/storagemanager.h \
            storage/xmlrenderer.h \
-           storage/xmlwriter.h
+           storage/xmlwriter.h \
+    core/boqdelegate.h
 FORMS += core/worksheetwidget.ui \
          gui/aboutdialog.ui \
          gui/addremoveurc.ui \
@@ -52,4 +53,5 @@ SOURCES += addons/printview.cpp \
            storage/sqlitedbmanager.cpp \
            storage/storagemanager.cpp \
            storage/xmlrenderer.cpp \
-           storage/xmlwriter.cpp
+           storage/xmlwriter.cpp \
+    core/boqdelegate.cpp
