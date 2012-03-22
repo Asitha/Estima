@@ -132,7 +132,7 @@ QList<Item> SQLiteDBManager::processItems(QSqlQuery& query)
   * get category_ID from category table and get items form Items table
   * that has the retrieved cat_ID
   */
-void SQLiteDBManager::getItemsof(QString category)
+QList<Item> SQLiteDBManager::getItemsof(QString category)
 {
     // method needs to be implementded
 

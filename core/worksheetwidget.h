@@ -79,7 +79,10 @@ private:
     QStandardItemModel *model;   
     QCompleter *itemCompleter, *categoryCompleter;
 
+    QAction *addRowAbove ;
+    QAction *addRowBelow;
 
+    void creatContextMenu();
     void addBOQItem(BOQItem &boqItem);
     void showError(const QString errorMsg);
     void setupCompleters();

@@ -51,11 +51,15 @@ private slots:
     void on_actionOpen_Project_triggered();
 
 
-    void on_actionAdd_Resource_triggered();
+
 
     void closeTab(int i);
 
     void createNewPoject(ProjData projData);
+
+    void on_actionAbout_Qt_triggered();
+
+    void on_actionResources_triggered();
 
 private:
     // members
@@ -69,9 +73,10 @@ private:
     MySQLConnector mySQLDBM;
     static int sheetCount;
     ProjectPropertiesForm *newProjForm ;
+    QString version;
 
     StorageManager *storageManager;
-
+    QDialog *dlg;
     QList<WorkSheetWidget> workSpaces;
 };
 

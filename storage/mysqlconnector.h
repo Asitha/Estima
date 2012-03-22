@@ -48,7 +48,7 @@ public:
     Item getItem(int itemID);
     Item getItem(QString description);
     void searchItem(QString description);
-    void getItemsof(QString category);
+    QList<Item> getItemsof(QString category);
     Resource getResource(int ID);
     QList<Resource> getResource(QString resourceName);
     bool addResource(Resource resource);

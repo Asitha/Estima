@@ -52,6 +52,7 @@ void XMLRenderer::saveURC(QString fileName, const URCData &data)
     for(iter= data.resources.begin(); iter < end ; ++iter){
         resourse = URCFile.createElement("Resource");
         resourse.setAttribute("ID", (*iter).ID );
+        resourse.setAttribute("Name",(*iter).name );
         resourse.setAttribute("Qty", (*iter).quantity);
         resourse.setAttribute("Type", (*iter).type);
         root.appendChild(resourse);
@@ -91,6 +92,7 @@ URCData XMLRenderer::retrieveFile(QString fileName)
                 if((tmpNode = ResourceItems.at(i)).isElement()){
                     resource =  tmpNode.toElement();
                     tmpResource.ID = resource.attribute("ID").toInt();
+                    tmpResource.name =  resource.attribute("Name");
                     tmpResource.quantity = resource.attribute("Qty").toFloat();
                     tmpResource.type = resource.attribute("Type").at(0).toAscii();
                     tmpData.resources.append(tmpResource);

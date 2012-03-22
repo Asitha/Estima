@@ -66,7 +66,15 @@
     <addaction name="actionAbout_Estima"/>
     <addaction name="actionAbout_Qt"/>
    </widget>
+   <widget class="QMenu" name="menuOptions">
+    <property name="title">
+     <string>Options</string>
+    </property>
+    <addaction name="actionResources"/>
+    <addaction name="actionItems"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuOptions"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
@@ -131,6 +139,16 @@
   <action name="actionAbout_Qt">
    <property name="text">
     <string>About Qt</string>
+   </property>
+  </action>
+  <action name="actionResources">
+   <property name="text">
+    <string>Resources</string>
+   </property>
+  </action>
+  <action name="actionItems">
+   <property name="text">
+    <string>Items</string>
    </property>
   </action>
  </widget>

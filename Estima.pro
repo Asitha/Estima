@@ -29,13 +29,16 @@ HEADERS += addons/printview.h \
            storage/storagemanager.h \
            storage/xmlrenderer.h \
            storage/xmlwriter.h \
-    core/boqdelegate.h
+    core/boqdelegate.h \
+    gui/resourcedatabrowser.h
+
 FORMS += core/worksheetwidget.ui \
          gui/aboutdialog.ui \
          gui/addremoveurc.ui \
          gui/addresource.ui \
          gui/projectpropertiesform.ui \
-         main/mainwindow.ui
+         main/mainwindow.ui \
+    gui/resourcedatabrowser.ui
 
 SOURCES += addons/printview.cpp \
            core/boqgenerator.cpp \
@@ -54,4 +57,5 @@ SOURCES += addons/printview.cpp \
            storage/storagemanager.cpp \
            storage/xmlrenderer.cpp \
            storage/xmlwriter.cpp \
-    core/boqdelegate.cpp
+    core/boqdelegate.cpp \
+    gui/resourcedatabrowser.cpp

@@ -17,6 +17,10 @@
 
 #include "addresource.h"
 #include "ui_addresource.h"
+#include "units.h"
+
+
+#include <QMessageBox>
 
 AddResource::AddResource(StorageManager &storageManager, QWidget *parent) :
     QDialog(parent),
@@ -24,10 +28,9 @@ AddResource::AddResource(StorageManager &storageManager, QWidget *parent) :
 {
     ui->setupUi(this);
     this->storageManager = &storageManager;
-    setWindowTitle("Resource Properties");
-    QStringList types;
-    types << "Material" << "Labour";
-    ui->typeComboBox->addItems(types);
+    setWindowTitle(tr("Resource Properties"));
+    fillUIData();
+
 }
 
 AddResource::~AddResource()
@@ -38,14 +41,62 @@ AddResource::~AddResource()
 void AddResource::on_applyButton_clicked()
 {
     Resource rsrc;
-//    ui->nameLineEdit->text() != "" ?
-    rsrc.name = "Test";
-    rsrc.quantity = 55.0;
-    qDebug() << storageManager->addResource(rsrc);
-    this->close();
+    QString errMsg;
+    if(validateData(&errMsg)){
+        rsrc.name = ui->nameLineEdit->text();
+        rsrc.unit = ui->unitRsrcComboBox->currentText();
+        if(ui->typeComboBox->currentText().compare("Material")){
+            rsrc.type = 'M';
+        }else {
+            rsrc.type = 'L';
+        }
+        rsrc.description = ui->descTextEdit->toPlainText();
+        rsrc.quantity = ui->quantityDoubleSpinBox->value();
+        rsrc.rate = ui->rateDoubleSpinBox->value();
+        QDate  date;
+        rsrc.lastModified = date.currentDate().toString("dd-MMM-yyyy");
+        storageManager->addResource(rsrc);
+        this->close();
+    }else{
+        QMessageBox::warning(this, tr("Invalid Input"), errMsg);
+
+    }
+
 }
 
 void AddResource::on_cancelButton_clicked()
 {
     this->close();
+}
+
+bool AddResource::validateData(QString *ErrorMessage)
+{
+    bool isValid = true;
+    *ErrorMessage = ("<h5>Please re-enter data avoiding following errors </h5> <ul>");
+    if(ui->nameLineEdit->text() == ""){
+        isValid = false;
+        ErrorMessage->append(" <li>Name can't be empty</li>");
+    }
+    if(ui->quantityDoubleSpinBox->value() == 0){
+        isValid = false;
+        ErrorMessage->append(" <li>Quantity should be a non zero value</li>");
+    }
+    if(ui->rateDoubleSpinBox->value() == 0 ){
+        isValid = false;
+        ErrorMessage->append(" <li>Rate should be a non zero value</li>");
+    }
+    ErrorMessage->append(" </ul>");
+
+    return isValid;
+}
+
+void AddResource::fillUIData()
+{
+    QStringList types;
+    types << "Material" << "Labour";
+
+
+    ui->typeComboBox->addItems(types);
+
+    ui->unitRsrcComboBox->addItems(Units::getInstance()->getUnits());
 }

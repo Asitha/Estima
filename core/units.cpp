@@ -17,12 +17,24 @@
 
 #include "units.h"
 
-Units::Units(StorageManager *storageManager, QObject *parent) :
-    QObject(parent)
+Units * Units::pInstance = 0;
+
+Units * Units::getInstance()
 {
-    this->storageManager = storageManager;
-    initUnitLists();
+    if(pInstance == 0){
+        pInstance = new Units();
+    }
+    return pInstance;
 }
+
+
+//Units::Units(StorageManager *storageManager, QObject *parent) :
+//    QObject(parent)
+//{
+//    this->storageManager = storageManager;
+//    initUnitLists();
+//}
+
 Units::Units(QObject *parent) :
     QObject(parent)
 {
@@ -60,3 +72,10 @@ QStringList Units::getUnitSystems()
 {
     return unitSystems;
 }
+
+void Units::setStorageManager(StorageManager &storageManager)
+{
+    this->storageManager = &storageManager;
+}
+
+

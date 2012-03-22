@@ -20,7 +20,9 @@
 #include "gui/aboutdialog.h"
 #include "core/worksheetwidget.h"
 #include "main/estima.h"
-#include "addresource.h"
+#include "gui/addresource.h"
+#include "units.h"
+#include "gui/resourcedatabrowser.h"
 
 #include <QFileDialog>
 
@@ -34,6 +36,7 @@ Estima::Estima(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    version = "0.5";
     setWindowTitle(tr("Estima"));
     ui->tabWidget->removeTab(0);
     ui->tabWidget->removeTab(0);
@@ -65,11 +68,7 @@ void Estima::on_actionNew_Project_triggered()
 
 }
 
-void Estima::on_actionAbout_Estima_triggered()
-{
-    AboutDialog about;
-    about.exec();
-}
+
 
 void Estima::on_actionOpen_Project_triggered()
 {
@@ -111,17 +110,11 @@ void Estima::init()
         // code to configure sql db
         QMessageBox::warning(this,tr("Estima"), tr("Couldn't connect to database")  );
         qDebug("couldn't connect");
+    }else{
+        Units::getInstance()->setStorageManager(*storageManager);
     }
 }
 
-
-
-
-void Estima::on_actionAdd_Resource_triggered()
-{
-    AddResource addRsrceProperties(*storageManager);
-    addRsrceProperties.exec();
-}
 
 void Estima::closeTab(int i)
 {
@@ -142,4 +135,29 @@ void Estima::createNewPoject(ProjData projData)
 
     currentSheet = new WorkSheetWidget(projData, *storageManager, this);
     addNewSheet(*currentSheet);
+}
+
+void Estima::on_actionAbout_Qt_triggered()
+{
+    qApp->aboutQt();
+
+}
+
+void Estima::on_actionAbout_Estima_triggered()
+{
+    QMessageBox::about(this,tr("About Estima"),
+        tr("<h2>Estima 0.5 </h2>"
+        "<p><b>copyright 2012, Asitha Nanayakkara (daun07@gmail.com)<b><p>"
+        "<p>This product is distributed under GNU GPL Licence and can be used by anyone "
+        "free of charge.<p>"));
+    /*
+    AboutDialog about;
+    about.exec();*/
+}
+
+void Estima::on_actionResources_triggered()
+{
+    ResourceDataBrowser *browser = new ResourceDataBrowser(*storageManager, this);
+    browser->exec();
+
 }

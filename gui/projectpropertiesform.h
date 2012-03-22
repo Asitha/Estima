@@ -19,7 +19,7 @@
 #define PROJECTPROPERTIESFORM_H
 
 #include "core/estimaEnums.h"
-#include "CoreStructures.h"
+#include "core/CoreStructures.h"
 #include <QDialog>
 
 

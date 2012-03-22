@@ -19,7 +19,7 @@
 #define ADDREMOVEURC_H
 
 #include "storage/storagemanager.h"
-#include "boqgenerator.h"
+#include "core/boqgenerator.h"
 #include "core/units.h"
 
 #include <QDialog>
@@ -57,7 +57,11 @@ private slots:
 
     void on_rsrcNamelineEdit_textEdited(const QString &arg1);
 
+    void removeRow();
+
 private:
+    QAction *removeResourceAct;
+
     StorageManager *storageManager;
     BOQGenerator *boqGenerator;
     Ui::AddRemoveURC *ui;
@@ -69,16 +73,18 @@ private:
     QSqlQueryModel itemModel;
     QSqlQueryModel resourceModel;
 
-    QStandardItemModel *resourceTableModel;
-//    QTreeView *treeView;
-
     Item item;
-    int currentRow;
+    int firstBlankRow;
 
-    bool addURCItem(ResourceURC rsrcData);
+    bool addToURCTable(ResourceURC rsrcData);
     void fillUIData();
     void setupCompleters();
+    void setupResourceTable();
+    int rowToAdd(QString name, int duplicityChkCol = 0);
     void clearTable();
+    QList<ResourceURC> getTableData();
+    void ShowItemData();
+    void createContextMenu();
 };
 
 #endif // ADDREMOVEURC_H

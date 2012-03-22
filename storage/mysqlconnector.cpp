@@ -122,18 +122,20 @@ QList<Item> MySQLConnector::processItems(QSqlQuery& query)
   * get category_ID from category table and get items form Items table
   * that has the retrieved cat_ID
   */
-void MySQLConnector::getItemsof(QString category)
+QList<Item> MySQLConnector::getItemsof(QString category)
 {
-    // method needs to be implementded
-
+    QList<Item> itemList;
     QSqlQuery query;
-    if(runQuery(QString("SELECT * FROM category WHERE Name='%1'").arg(category), &query, true))
-    {
-        while (query.next()){
-            qDebug() << "ID" <<  query.value(0).toInt() ;
-            qDebug() << "ID" << query.value(1).toString() ;
-        }
-    }
+    QString stmt = QString("SELECT item.ID, category_ID, Formula_ID, Reference_No, Description, Unit, "
+                           "Date_Created FROM category join item WHERE category.name='%1' and "
+                           "category.ID = item.Category_ID").arg(category);
+    if(runQuery(stmt, &query, true))
+        itemList = processItems(query);
+
+    foreach(Item itm, itemList)
+        itm.category = category;
+
+    return itemList;
 }
 
 

@@ -37,7 +37,7 @@ public:
     virtual Item getItem(int itemID) =0;
     virtual void searchItem(QString description)= 0;
 
-    virtual void getItemsof(QString category)= 0;
+    virtual QList<Item> getItemsof(QString category)= 0;
     virtual Resource getResource(int ID) = 0;
     virtual QList<Resource> getResource(QString resourceName) = 0;
 

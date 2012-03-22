@@ -17,7 +17,7 @@
 
 #include "projectpropertiesform.h"
 #include "ui_projectpropertiesform.h"
-#include "units.h"
+#include "core/units.h"
 
 #include <QMessageBox>
 
@@ -27,8 +27,8 @@ ProjectPropertiesForm::ProjectPropertiesForm(QWidget *parent) :
 {
     ui->setupUi(this);
     setWindowTitle(tr("Project Properties"));
-    Units units;
-    ui->unitSystemComboBox->addItems(units.getUnitSystems());
+    ;
+    ui->unitSystemComboBox->addItems(Units::getInstance()->getUnitSystems());
 }
 
 ProjectPropertiesForm::~ProjectPropertiesForm()

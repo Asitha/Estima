@@ -42,6 +42,9 @@ private slots:
 private:
     Ui::AddResource *ui;
     StorageManager *storageManager;
+
+    bool validateData(QString *errorMessage);
+    void fillUIData();
 };
 
 #endif // ADDRESOURCE_H

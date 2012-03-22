@@ -15,6 +15,8 @@
    along with Estima.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+
+
 #include <QtGui/QApplication>
 #include <QPluginLoader>
 #include <QtPlugin>
@@ -29,55 +31,6 @@
 #include "storage/sqlitedbmanager.h"
 
 
-//TEST CODE
-void testXML(){
-
-    XMLRenderer xmlrenderer;
-    URCData data;
-    data.itemID = 4;
-    data.convConst = 2.68;
-    data.unitURC = "cube";
-    data.URCQuantity = 1;
-
-    ResourceURC rub, cem, sand, skl, uskl ;
-    rub.ID = 6;
-    rub.quantity = 3.68;
-    rub.type = 'M';
-
-    cem.ID = 1;
-    cem.quantity = 250;
-    rub.type = 'M';
-
-    sand.ID = 2;
-    sand.quantity = 0.85;
-    rub.type = 'M';
-
-    skl.ID = 4;
-    skl.quantity = 32;
-    rub.type = 'L';
-
-    uskl.ID = 5;
-    uskl.quantity = 48;
-    rub.type = 'L';
-
-    data.resources.append(rub);
-    data.resources.append(cem);
-    data.resources.append(sand);
-    data.resources.append(skl);
-    data.resources.append(uskl);
-
-
-//    for(int i=0; i <5;i++){
-//        ResourceURC resource;
-//        resource.ID =i;
-//        resource.quantity =20+i*48.4;
-//        resource.type = 'M';
-//        data.resources.append(resource);
-//    }
-    QString name= "G.2.1.1.1";
-    xmlrenderer.saveURC(name, data);
-//    xmlrenderer.retrieveFile(name);
-}
 
 //TEST CODE
 void testDB()
@@ -104,10 +57,18 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
     app.setApplicationName("Estima");
-    testXML();
 
     Estima estima;
     estima.show();
 //    testDB();
+
+    QDate  date;
+    QString d1 = date.currentDate().toString("dd-MMM-yyyy");
+    qDebug() << d1;
+    QDate date2;
+    date2 = date2.fromString("25Mar2012", "ddMMMyyyy");
+    qDebug() << date2.currentDate();
+
     return app.exec();
 }
+

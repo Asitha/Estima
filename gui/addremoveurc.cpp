@@ -15,6 +15,7 @@
    along with Estima.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <QTableWidget>
 #include "addremoveurc.h"
 #include "ui_addremoveurc.h"
 
@@ -26,23 +27,24 @@ AddRemoveURC::AddRemoveURC(StorageManager *storageManager,BOQGenerator *boqGener
     ui->setupUi(this);
     this->storageManager = storageManager;
     this->boqGenerator =  boqGenerator;
-    setWindowTitle("unit rate calculation properties");
+    setWindowTitle(tr("unit rate calculation properties"));
 
+    ui->convConstSpinBox->setMaximum(1000000);
+    ui->rsrcQtySpinBox->setMaximum(1000000000);
+    setupResourceTable();
     setupCompleters();
     fillUIData();
+    createContextMenu();
 
 }
 
 AddRemoveURC::~AddRemoveURC()
 {
-
     delete ui;
-
 }
 
 void AddRemoveURC::on_AddRsrcPushButton_clicked()
 {
-
     ResourceURC rsrcURC;
     rsrcURC.name = ui->rsrcNamelineEdit->text();
     QList<Resource> list = storageManager->getResource(rsrcURC.name);
@@ -53,7 +55,7 @@ void AddRemoveURC::on_AddRsrcPushButton_clicked()
         rsrcURC.ID = list.first().ID;
         rsrcURC.type = list.first().type.toAscii();
         urcData.resources.append(rsrcURC);
-        addURCItem(rsrcURC);
+        addToURCTable(rsrcURC);
 
     }else{
         // ERROR HANDLING
@@ -66,11 +68,7 @@ void AddRemoveURC::on_AddRsrcPushButton_clicked()
 void AddRemoveURC::on_URCEditButtonBox_accepted()
 {
     QString itemDesc = ui->itemlineEdit->text();
-    int row =    ui->itemlineEdit->completer()->currentRow();
-//    QModelIndex index = ui->itemlineEdit->completer()->model()->index(row, 0);
-//    QVariant i = ui->itemlineEdit->completer()->model()->data(index);
-//    int id;
-//    i.convert(id);
+
     item =  storageManager->getItem(itemDesc);
     if(item.ID != StorageManager::INVALID_Item_ID){
 
@@ -78,13 +76,19 @@ void AddRemoveURC::on_URCEditButtonBox_accepted()
         urcData.URCQuantity = ui->itemQtySpinBox->value();
         urcData.itemID = item.ID;
         urcData.unitURC = ui->calcUnitComboBox->currentText();
-//        urcData.description = ui->itemDescTextEdit->toPlainText();
 
-        storageManager->saveURC(item.refNum, urcData);
+
+        if(urcData.resources.isEmpty()){
+            QMessageBox::warning(this, tr("No Resources added"),
+               tr("Please add resources before saving unit rate calculation"));
+        }else{
+            storageManager->saveURC(item.refNum, urcData);
+            qDebug("URC data stored");
+        }
     }else{
         // qmessage needed
     }
-
+    this->deleteLater();
     qDebug("Acc");
 }
 
@@ -93,115 +97,39 @@ void AddRemoveURC::on_URCEditButtonBox_rejected()
     qDebug("Rej");
 }
 
-bool AddRemoveURC::addURCItem(ResourceURC rsrcURCData)
-{
-    QStandardItem *item = resourceTableModel->item(0,0);
-    resourceTableModel->appendRow(item);
-    Resource rsrc = storageManager->getResource(rsrcURCData.ID);
-    CalcData calcData = boqGenerator->getUnitRate(urcData);
-    ui->stdUnitRateLabel->setText(QString("Standard unit rate(with markup) : %1").arg(calcData.unitRate));
 
-    if(rsrc.ID != StorageManager::INVALID_Resource_ID){
-        QModelIndex index= resourceTableModel->index(currentRow   ,   0, QModelIndex());
-        resourceTableModel->setData(index, rsrc.name);
-        index= resourceTableModel->index(currentRow   ,   1, QModelIndex());
-        resourceTableModel->setData(index, rsrcURCData.quantity);
-        index= resourceTableModel->index(currentRow    ,   2, QModelIndex());
-        resourceTableModel->setData(index, rsrc.unit);
-        index= resourceTableModel->index(currentRow    ,   3, QModelIndex());
-        resourceTableModel->setData(index, rsrc.rate);
-        index= resourceTableModel->index(currentRow    ,   4, QModelIndex());
-        resourceTableModel->setData(index, rsrc.rate*rsrcURCData.quantity);
-        index= resourceTableModel->index(currentRow+1    ,   4, QModelIndex());
-        resourceTableModel->setData(index, calcData.unitRateBM);
-        //        resourceTableModel->setData(index, ur);
-//        index= resourceTableModel->index(currentRow    ,   5, QModelIndex());
-
-
-        currentRow++;
-
-
-
-        return true;
-    }else
-        return false;
-}
 
 bool AddRemoveURC::fillData(Item item)
 {
     urcData = storageManager->retrieveURC(item.refNum);
-    ui->itemlineEdit->setText(item.description);
-    ui->convConstSpinBox->setValue(urcData.convConst);
-    ui->itemQtySpinBox->setValue(urcData.URCQuantity);
-    int index  = ui->calcUnitComboBox->findText(urcData.unitURC);
-    ui->calcUnitComboBox->setCurrentIndex(index);
-    ui->textBrowser->setText(urcData.description);
-//    ui->stdUnitComboBox->setItemText(urcData.);
-    foreach(ResourceURC resrcURC, urcData.resources){
-        addURCItem(resrcURC);
-    }
 
+    if(urcData.itemID != StorageManager::INVALID_Item_ID){
+        ui->itemlineEdit->setText(item.description);
+        ui->convConstSpinBox->setValue(urcData.convConst);
+        ui->itemQtySpinBox->setValue(urcData.URCQuantity);
+        int index  = ui->calcUnitComboBox->findText(urcData.unitURC);
+        ui->calcUnitComboBox->setCurrentIndex(index);
+        ui->textBrowser->setText(urcData.description);
+        index  = ui->stdUnitComboBox->findText(item.unit);
+        ui->stdUnitComboBox->setCurrentIndex(index);
+        foreach(ResourceURC resrcURC, urcData.resources){
+            addToURCTable(resrcURC);
+        }
+    }
 
 }
 
 void AddRemoveURC::on_itemlineEdit_editingFinished()
 {
-    Item item = storageManager->getItem(ui->itemlineEdit->text());
-    if(item.ID != StorageManager::INVALID_Item_ID){
-        currentRow = 0;
-        clearTable();
-        fillData(item);
-    }
+    ShowItemData();
 }
 
-void AddRemoveURC::setupCompleters()
-{
-    itemModel.setQuery("SELECT ID, Description FROM item");
-    QTreeView *treeView =  new QTreeView;
 
-    itemCompleter = new QCompleter(&itemModel,this);
-    itemCompleter->setPopup(treeView);
-    treeView->setRootIsDecorated(false);
-    treeView->header()->hide();
-    treeView->header()->setStretchLastSection(false);
-    treeView->header()->setResizeMode(0, QHeaderView::Stretch);
-    treeView->header()->setResizeMode(1, QHeaderView::ResizeToContents);
-
-    itemCompleter->setCaseSensitivity(Qt::CaseInsensitive);
-    itemCompleter->setCompletionColumn(1);
-    itemCompleter->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
-    ui->itemlineEdit->setCompleter(itemCompleter);
-
-    QTreeView *resTreeView = new QTreeView ;
-    resTreeView->setRootIsDecorated(false);
-    resTreeView->header()->hide();
-//    resTreeView->header()->setStretchLastSection(false);
-//    resTreeView->header()->setResizeMode(0, QHeaderView::ResizeToContents);
-//    resTreeView->header()->setResizeMode(1, QHeaderView::ResizeToContents);
-
-    resourceModel.setQuery("SELECT ID, NAME From resource");
-    resourceCompleter = new QCompleter(&resourceModel, this);
-    resourceCompleter->setPopup(resTreeView);
-    resourceCompleter->setCompletionColumn(1);
-    resourceCompleter->setCaseSensitivity(Qt::CaseInsensitive);
-    resourceCompleter->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
-    ui->rsrcNamelineEdit->setCompleter(resourceCompleter);
-
-}
 
 void AddRemoveURC::fillUIData()
 {
-    // table model
-    currentRow = 0;
-    resourceTableModel = new QStandardItemModel(5, 6 , this);
-    ui->URCTableView->setModel(resourceTableModel);
-
-    QStringList headers;
-    headers << "Name" << "Qty" << "Unit" << "Rate" << "Amount" << "Description";
-    resourceTableModel->setHorizontalHeaderLabels(headers);
-    ui->URCTableView->horizontalHeader()->setStretchLastSection(true);
     // combo box data
-    units = new Units(storageManager, this);
+    units = Units::getInstance();
     ui->calcUnitComboBox->addItems(units->getUnits());
     ui->calcUnitComboBox->setDuplicatesEnabled(false);
 
@@ -209,20 +137,13 @@ void AddRemoveURC::fillUIData()
     ui->stdUnitComboBox->setDuplicatesEnabled(false);
 }
 
-void AddRemoveURC::clearTable()
-{
-    resourceTableModel->clear();
-    QStringList headers;
-    headers << "Name" << "Qty" << "Unit" << "Rate" << "Amount" << "Description";
-    resourceTableModel->setHorizontalHeaderLabels(headers);
 
-}
 
 void AddRemoveURC::on_rsrcNamelineEdit_editingFinished()
 {
-    ResourceURC rsrcURC;
-    rsrcURC.name = ui->rsrcNamelineEdit->text();
-    QList<Resource> list = storageManager->getResource(rsrcURC.name);
+
+    QString resourceName = ui->rsrcNamelineEdit->text();
+    QList<Resource> list = storageManager->getResource(resourceName);
     if(!list.isEmpty()){
        ui->rsrcUnitLabel->setText(list.first().unit);
     }
@@ -242,4 +163,203 @@ void AddRemoveURC::on_rsrcNamelineEdit_textEdited(const QString &arg1)
     QString txt = QString("SELECT ID, Name FROM resource WHERE name LIKE '\%%1\%' ").arg(arg1);
     resourceModel.setQuery(txt);
 
+}
+
+
+void AddRemoveURC::clearTable()
+{
+    ui->URCTableWidget->clear();
+    setupResourceTable();
+}
+
+
+/**
+  * name - name of the string that it should search for
+  * duplicityChkCol - the column in which the duplicate strings should be checked for
+  */
+int AddRemoveURC::rowToAdd(QString name, int duplicityChkCol)
+{
+    int editingRow = 0;
+    bool hasDuplicate = false;
+
+    QList<QTableWidgetItem *> itemList;
+            itemList = ui->URCTableWidget->findItems(name, Qt::MatchExactly);
+
+    for(int i =0; i < itemList.size(); i++){
+        if(itemList.at(i)->column() == duplicityChkCol){
+           editingRow = itemList.at(i)->row();
+           hasDuplicate = true;
+        }
+    }
+    if(!hasDuplicate){
+        editingRow = firstBlankRow;
+        if(ui->URCTableWidget->rowCount() == (firstBlankRow+1)  ){
+            ui->URCTableWidget->insertRow(firstBlankRow);
+        }
+        ++firstBlankRow;
+    }
+    qDebug() << "[Adding item]First blank row " << firstBlankRow;
+    return editingRow;
+}
+
+
+bool AddRemoveURC::addToURCTable(ResourceURC rsrcURCData)
+{
+    QTableWidgetItem *items[6];
+
+    Resource rsrc = storageManager->getResource(rsrcURCData.ID);
+    CalcData calcData = boqGenerator->getUnitRate(urcData);
+    ui->stdUnitRateLabel->setText(QString("Standard unit rate(with markup)"
+                              " : %1").arg(calcData.unitRate));
+
+    if(rsrc.ID != StorageManager::INVALID_Resource_ID){
+
+        int editingRow = rowToAdd(rsrc.name);
+        items[0] = new QTableWidgetItem(rsrc.name);
+        double qty =  rsrcURCData.quantity;
+        items[1] = new QTableWidgetItem(QString().setNum(qty, 'f', 2));
+        items[1]->setTextAlignment(Qt::AlignRight);
+        items[2] = new QTableWidgetItem(rsrc.unit);
+        items[2]->setTextAlignment(Qt::AlignRight);
+        items[3] = new QTableWidgetItem(QString().setNum(rsrc.rate, 'f',2));
+        items[3]->setTextAlignment(Qt::AlignRight);
+        items[4] = new QTableWidgetItem(QString().setNum(qty* rsrc.rate, 'f',2));
+        items[4]->setTextAlignment(Qt::AlignRight);
+        items[5] = new QTableWidgetItem(rsrc.description);
+
+        for(int col = 0; col < 6; ++col){
+            ui->URCTableWidget->setItem(editingRow, col, items[col]);
+        }
+        ui->URCTableWidget->resizeRowToContents(editingRow);
+        return true;
+    }else{
+        return false;
+    }
+}
+
+
+
+void AddRemoveURC::setupCompleters()
+{
+    itemModel.setQuery("SELECT ID, Description FROM item");
+    QTreeView *treeView =  new QTreeView;
+
+    itemCompleter = new QCompleter(&itemModel,this);
+    itemCompleter->setPopup(treeView);
+    treeView->setRootIsDecorated(false);
+    treeView->header()->hide();
+    treeView->header()->setStretchLastSection(false);
+    treeView->header()->resizeSection(0, 0);
+    treeView->header()->setResizeMode(0, QHeaderView::Fixed);
+    treeView->header()->setResizeMode(1, QHeaderView::Stretch);
+
+    itemCompleter->setCaseSensitivity(Qt::CaseInsensitive);
+    itemCompleter->setCompletionColumn(1);
+    itemCompleter->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
+    ui->itemlineEdit->setCompleter(itemCompleter);
+
+
+
+    QTreeView *resTreeView = new QTreeView ;
+    resourceModel.setQuery("SELECT ID, NAME From resource");
+    resourceCompleter = new QCompleter(&resourceModel, this);
+    resourceCompleter->setPopup(resTreeView);
+    resTreeView->setRootIsDecorated(false);
+    resTreeView->header()->hide();
+    resTreeView->header()->setStretchLastSection(false);
+    resTreeView->header()->resizeSection(0, 0);
+    resTreeView->header()->setResizeMode(0, QHeaderView::Fixed);
+    resTreeView->header()->setResizeMode(1, QHeaderView::Stretch);
+
+
+    resourceCompleter->setCompletionRole(Qt::DisplayRole);
+    resourceCompleter->setCompletionColumn(1);
+    resourceCompleter->setCaseSensitivity(Qt::CaseInsensitive);
+    resourceCompleter->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
+    ui->rsrcNamelineEdit->setCompleter(resourceCompleter);
+
+}
+
+
+void AddRemoveURC::setupResourceTable()
+{
+    firstBlankRow = 0;
+
+    ui->URCTableWidget->setColumnCount(6);
+    ui->URCTableWidget->setRowCount(6);
+    ui->URCTableWidget->setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::SelectedClicked);
+    ui->URCTableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
+
+    QStringList headers;
+    headers << "Name" << "Qty" << "Unit" << "Rate" << "Amount" << "Description";
+    ui->URCTableWidget->setHorizontalHeaderLabels(headers);
+    ui->URCTableWidget->horizontalHeader()->setStretchLastSection(true);
+
+    ui->URCTableWidget->setColumnWidth(0, 150);
+    ui->URCTableWidget->setColumnWidth(1, 100);
+    ui->URCTableWidget->setColumnWidth(2, 50);
+    ui->URCTableWidget->setColumnWidth(3, 100);
+    ui->URCTableWidget->setColumnWidth(4, 100);
+    ui->URCTableWidget->setColumnWidth(5, 150);
+
+
+}
+
+QList<ResourceURC> AddRemoveURC::getTableData()
+{
+    QList<ResourceURC> rsrcURCList;
+
+    // TODO:
+    return rsrcURCList;
+}
+
+void AddRemoveURC::ShowItemData()
+{
+    urcData.resources.clear();
+    Item item = storageManager->getItem(ui->itemlineEdit->text());
+    if(item.ID != StorageManager::INVALID_Item_ID){
+        firstBlankRow = 0;
+        clearTable();
+        fillData(item);
+    }
+}
+
+/**
+  * creates the context menu of the URCTableWidget
+  */
+void AddRemoveURC::createContextMenu()
+{
+    removeResourceAct = new QAction("Remove resource", this);
+    ui->URCTableWidget->addAction(removeResourceAct);
+
+    ui->URCTableWidget->setContextMenuPolicy(Qt::ActionsContextMenu);
+    connect(removeResourceAct, SIGNAL(triggered()), this, SLOT(removeRow()));
+}
+
+
+/**
+  * SLOT that reacts to the context menu signal for removing items.
+  */
+void AddRemoveURC::removeRow()
+{
+    QModelIndex idx = ui->URCTableWidget->selectionModel()->currentIndex();
+    ResourceURC rsrcURC;
+    QString rsrsNameInTable;
+
+    if(idx.row() < firstBlankRow){
+        for(int i = 0; i < urcData.resources.size(); i++){
+            rsrcURC = urcData.resources.at(i);
+            rsrsNameInTable = "";
+            rsrsNameInTable = ui->URCTableWidget->itemAt(idx.row(), 0)->text() ;
+
+            if(rsrcURC.name.compare(rsrsNameInTable) == 0){
+                urcData.resources.removeAt(i);
+                i--;
+            }
+            ui->URCTableWidget->removeRow(idx.row());
+        }
+        firstBlankRow--;
+    }else {
+        qDebug() << "[remove] item removed " << firstBlankRow;
+    }
 }

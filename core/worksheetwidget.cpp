@@ -35,6 +35,7 @@ WorkSheetWidget::WorkSheetWidget(ProjData projData, StorageManager& storageManag
     boqGenerator->setMarkup(projData.markup);
     setupBOQTable();
     setupCompleters();
+    creatContextMenu();
 }
 
 WorkSheetWidget::~WorkSheetWidget()
@@ -123,8 +124,11 @@ void WorkSheetWidget::on_pushButton_3_clicked()
 
 void WorkSheetWidget::on_categoryEdit_lostFocus()
 {
-//    storageManager->getCate
-    qDebug("Lost");
+    // TODO:
+
+//    QString txt = QString("SELECT item.ID, Description category join item WHERE category.name='%1' and "
+//         "category.ID = item.Category_ID").arg(ui->categoryEdit->text());
+//    categoryModel.setQuery(txt);
 }
 
 
@@ -151,7 +155,8 @@ void WorkSheetWidget::setupCompleters()
     itemTreeView->setRootIsDecorated(false);
     itemTreeView->header()->hide();
     itemTreeView->header()->setStretchLastSection(false);
-    itemTreeView->header()->setResizeMode(0, QHeaderView::Stretch);
+    itemTreeView->header()->resizeSection(0, 0);
+    itemTreeView->header()->setResizeMode(0, QHeaderView::Fixed);
     itemTreeView->header()->setResizeMode(1, QHeaderView::ResizeToContents);
 
     itemCompleter->setCaseSensitivity(Qt::CaseInsensitive);
@@ -166,7 +171,8 @@ void WorkSheetWidget::setupCompleters()
     categoryTreeView->setRootIsDecorated(false);
     categoryTreeView->header()->hide();
     categoryTreeView->header()->setStretchLastSection(false);
-    categoryTreeView->header()->setResizeMode(0, QHeaderView::Stretch);
+    categoryTreeView->header()->resizeSection(0, 0);
+    categoryTreeView->header()->setResizeMode(0, QHeaderView::Fixed);
     categoryTreeView->header()->setResizeMode(1, QHeaderView::ResizeToContents);
     categoryCompleter->setCompletionColumn(1);
     categoryCompleter->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
@@ -202,7 +208,7 @@ void WorkSheetWidget::setupBOQTable()
     ui->tableView->setColumnWidth(5, 100);
     ui->tableView->setItemDelegate(&boqItemDelgate);
     ui->tableView->horizontalHeader()->setStretchLastSection(true);
-//    ui->tableView->mousePressEvent(QMouseEvent *event);
+
 
     connect(ui->tableView, SIGNAL(pressed(QModelIndex)), this, SLOT(showPopupMenu(QModelIndex )));
     QStringList headers;
@@ -211,16 +217,26 @@ void WorkSheetWidget::setupBOQTable()
     ui->tableView->horizontalHeader()->stretchLastSection();
 }
 
+// TODO: method needs renaming
 void WorkSheetWidget::showPopupMenu(QModelIndex index)
 {
-//    qDebug() << "row" << index.row();
-//    qDebug() << "col" << index.column() ;
+    ui->tableView->selectRow(index.row());
+
     Qt::MouseButtons  buttons =  QApplication::mouseButtons();
     if(buttons == Qt::LeftButton){
         qDebug()<< "left";
     }
-    QTreeView *popup = new QTreeView(this);
+//    QTreeView *popup = new QTreeView(this);
 
-    popup->header()->hide();
-    popup->show();
+//    popup->header()->hide();
+//    popup->show();
+}
+
+void WorkSheetWidget::creatContextMenu()
+{
+    addRowAbove = new QAction("Add row above", this);
+    addRowBelow = new QAction("Add row Below", this);
+    ui->tableView->addAction(addRowAbove);
+    ui->tableView->addAction(addRowBelow);
+    ui->tableView->setContextMenuPolicy(Qt::ActionsContextMenu);
 }

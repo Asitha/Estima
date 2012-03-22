@@ -32,12 +32,12 @@ XMLWriter::XMLWriter()
 void XMLWriter::saveFile(QString fileName, const QDomDocument& domDoc  )
 {
 
-    // writing to file
-    QDir dir;
-    QString path = "./UnitRateData";
-    if(!dir.exists(path)){
-        dir.mkdir(path);
-    }
+//    // writing to file
+//    QDir dir;
+//    QString path = "./UnitRateData";
+//    if(!dir.exists(path)){
+//        dir.mkdir(path);
+//    }
 
     QFile file(fileName);
     if(file.open(QIODevice::WriteOnly | QIODevice::Text))
@@ -45,6 +45,7 @@ void XMLWriter::saveFile(QString fileName, const QDomDocument& domDoc  )
         QTextStream stream(&file);
         stream << domDoc.toString();
         file.close();
+        qDebug()<< QString("Written to file \"%1\" succesfully").arg(fileName);
     }else{
         qDebug("Couldn't write to file");
     }

@@ -15,51 +15,36 @@
    along with Estima.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
-#ifndef UNITS_H
-#define UNITS_H
-
+#ifndef RESOURCEDATABROWSER_H
+#define RESOURCEDATABROWSER_H
 
 #include "storage/storagemanager.h"
-#include <QObject>
 
-struct unit{
+#include <QDialog>
 
-    QString symbol;
-    QString name;
-    bool isStd;
+namespace Ui {
+    class ResourceDataBrowser;
+}
 
-
-};
-
-class Units : public QObject
+class ResourceDataBrowser : public QDialog
 {
     Q_OBJECT
 
 public:
+    explicit ResourceDataBrowser(StorageManager &storageManager ,QWidget *parent = 0);
+    ~ResourceDataBrowser();
 
-    static Units *getInstance();
+private slots:
+    void on_closeButton_clicked();
 
-    void setStorageManager(StorageManager &storageManger);
-    QStringList getStdUnits();
-    QStringList getUnits();
-    QStringList getNonStdUnits();
-    QStringList getUnitSystems();
-
-
-signals:
-
-public slots:
+    void on_AddResourceButton_clicked();
 
 private:
-    Units(QObject *parent = 0);
-
-    static Units *pInstance;
     StorageManager *storageManager;
-    QStringList stdUnits;
-    QStringList nonStdUnits;
-    QStringList unitSystems;
-    void initUnitLists();
+    Ui::ResourceDataBrowser *ui;
+
+    QSqlTableModel *model;
+    void setupResourceTable();
 };
 
-#endif // UNITS_H
+#endif // RESOURCEDATABROWSER_H
