@@ -20,7 +20,7 @@
 #include <QtGui>
 
 BOQDelegate::BOQDelegate(QObject *parent) :
-    QItemDelegate(parent)
+    QStyledItemDelegate(parent)
 {
 }
 
@@ -60,11 +60,12 @@ void BOQDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const
     if(index.column() == 2 || index.column() > 3){
         QDoubleSpinBox *spinBox = static_cast<QDoubleSpinBox *>(editor);
         double value = spinBox->value();
+        QString str = QString().setNum(value, 'f', 2);
         if(value == 0){
             model->setData(index, QString("NULL"),Qt::EditRole);
-        }else{
 
-            model->setData(index, value ,Qt::EditRole);
+        }else{
+            model->setData(index, str ,Qt::EditRole);
         }
     }
     else {
@@ -78,3 +79,13 @@ void BOQDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewIt
 {
     editor->setGeometry(option.rect);
 }
+
+//void BOQDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+//{
+//    if(index.column() == 2 || index.column() > 3){
+////        option.decorationAlignment = Qt::AlignRight;
+
+//    }else{
+
+//    }
+//}

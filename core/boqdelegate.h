@@ -19,13 +19,14 @@
 #define BOQDELEGATE_H
 
 #include <QItemDelegate>
+#include <QStyledItemDelegate>
 
 /*
  * This is an item delgate class to be used with BOQ table in worksheet.
  */
 
 
-class BOQDelegate : public QItemDelegate
+class BOQDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
 public:
@@ -40,6 +41,8 @@ public:
 
     void updateEditorGeometry(QWidget *editor,
         const QStyleOptionViewItem &option, const QModelIndex &index) const;
+
+//     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 signals:
 
 public slots:

@@ -19,6 +19,8 @@
 #include "ui_resourcedatabrowser.h"
 #include "addresource.h"
 
+#include <QDebug>
+
 ResourceDataBrowser::ResourceDataBrowser(StorageManager &storageManager, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::ResourceDataBrowser)
@@ -26,6 +28,8 @@ ResourceDataBrowser::ResourceDataBrowser(StorageManager &storageManager, QWidget
     ui->setupUi(this);
     this->storageManager = &storageManager;
     setWindowTitle(tr("Resource Data Browser"));
+
+    initActions();
     setupResourceTable();
 }
 
@@ -52,9 +56,52 @@ void ResourceDataBrowser::setupResourceTable()
     model->select();
     model->removeColumn(0);
     ui->tableView->setModel(model);
-    ui->tableView->resizeRowsToContents();
     ui->tableView->resizeColumnsToContents();
+    ui->tableView->resizeRowsToContents();
     ui->tableView->horizontalHeader()->setStretchLastSection(true);
     ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+}
+
+void ResourceDataBrowser::fillUIData()
+{
+    QStringList typeList;
+    typeList << "Material" << "Labour" ;
+    ui->resourceTypeComboBox->addItems(typeList);
+}
+
+void ResourceDataBrowser::initActions()
+{
+    removeResource = new QAction(tr("Remove Resource"), this);
+    addResource = new QAction(tr("Add Resource"), this);
+    editResource = new QAction(tr("Edit Resource"), this);
+
+    ui->tableView->addAction(addResource);
+    ui->tableView->addAction(editResource);
+    ui->tableView->addAction(removeResource);
+
+    ui->tableView->setContextMenuPolicy(Qt::ActionsContextMenu);
+    ui->tableView->setAlternatingRowColors(true);
+    connect(removeResource, SIGNAL(triggered()), this, SLOT(removeSelectedResource()));
+
+}
+
+void ResourceDataBrowser::removeSelectedResource()
+{
+    // Even when an item is not selected this will be activated;
+    QModelIndex idx = ui->tableView->selectionModel()->currentIndex();
+
+    ui->tableView->model()->removeRow(idx.row(), idx);
+
+
+}
+
+void ResourceDataBrowser::addNewResource()
+{
+
+
+}
+
+void ResourceDataBrowser::editSelectedResource()
+{
 }

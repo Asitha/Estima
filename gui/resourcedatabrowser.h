@@ -39,12 +39,25 @@ private slots:
 
     void on_AddResourceButton_clicked();
 
+    void removeSelectedResource();
+
+    void addNewResource();
+
+    void editSelectedResource();
+
+
 private:
+    QAction *removeResource;
+    QAction *addResource;
+    QAction *editResource;
+
     StorageManager *storageManager;
     Ui::ResourceDataBrowser *ui;
 
     QSqlTableModel *model;
     void setupResourceTable();
+    void fillUIData();
+    void initActions();
 };
 
 #endif // RESOURCEDATABROWSER_H

@@ -90,13 +90,13 @@ void WorkSheetWidget::addBOQItem(BOQItem &boqItem)
     index= model->index(currentRow   ,   1, QModelIndex());
     model->setData(index, boqItem.itemStruct.description);
     index= model->index(currentRow    ,   2, QModelIndex());
-    model->setData(index, boqItem.qty);
+    model->setData(index, QString().setNum(boqItem.qty, 'f', 2));
     index= model->index(currentRow    ,   3, QModelIndex());
     model->setData(index, boqItem.itemStruct.unit);
     index= model->index(currentRow    ,   4, QModelIndex());
-    model->setData(index, boqItem.unitRate);
+    model->setData(index, QString().setNum(boqItem.unitRate,'f', 2));
     index= model->index(currentRow    ,   5, QModelIndex());
-    model->setData(index, boqItem.amount);
+    model->setData(index, QString().setNum(boqItem.amount, 'f', 2));
     ui->tableView->resizeRowToContents(currentRow);
     currentRow++;
 
@@ -215,6 +215,8 @@ void WorkSheetWidget::setupBOQTable()
     headers << "Ref No" << "Description"<< "Qty"<< "Unit" << "Rate"<< "Amount";
     model->setHorizontalHeaderLabels(headers);
     ui->tableView->horizontalHeader()->stretchLastSection();
+
+
 }
 
 // TODO: method needs renaming

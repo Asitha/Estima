@@ -302,7 +302,7 @@ void AddRemoveURC::setupResourceTable()
     ui->URCTableWidget->setColumnWidth(4, 100);
     ui->URCTableWidget->setColumnWidth(5, 150);
 
-
+    ui->URCTableWidget->setAlternatingRowColors(true);
 }
 
 QList<ResourceURC> AddRemoveURC::getTableData()

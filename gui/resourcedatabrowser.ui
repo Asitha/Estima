@@ -36,7 +36,7 @@
         <widget class="QLineEdit" name="lineEdit"/>
        </item>
        <item>
-        <widget class="QComboBox" name="comboBox">
+        <widget class="QComboBox" name="resourceTypeComboBox">
          <property name="minimumSize">
           <size>
            <width>186</width>
