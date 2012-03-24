@@ -22,7 +22,7 @@
 UnitRateCalculator::UnitRateCalculator(StorageManager& storageManager, QObject *parent) :
     QObject(parent)
 {
-    this->storageManager = &storageManager;
+    this->pStorageManager = &storageManager;
 
 }
 
@@ -34,7 +34,7 @@ UnitRateCalculator::UnitRateCalculator(StorageManager& storageManager, QObject *
   */
 CalcData UnitRateCalculator::getUnitRate(QString& refNum, float& markup)
 {
-    URCData urcData = storageManager->retrieveURC(refNum);
+    URCData urcData = pStorageManager->retrieveURC(refNum);
     return  getUnitRate(urcData, markup);
 }
 
@@ -44,7 +44,7 @@ CalcData UnitRateCalculator::getUnitRate(URCData urcData, float& markup)
 {
 
     calcData.markup = markup;
-    if(urcData.itemID != storageManager->INVALID_Item_ID ){
+    if(urcData.itemID != pStorageManager->INVALID_Item_ID ){
        calcData.unitRateBM = calculateUnitRate(urcData);
        calcData.unitRate = calcData.unitRateBM * (1+markup);
 
@@ -61,7 +61,7 @@ CalcData UnitRateCalculator::getUnitRate(URCData urcData, float& markup)
 
 void UnitRateCalculator::setStorageManager(StorageManager& storageManager)
 {
-    this->storageManager = &storageManager;
+    this->pStorageManager = &storageManager;
 }
 
 float UnitRateCalculator::calculateUnitRate(URCData dataSet)
@@ -78,9 +78,9 @@ float UnitRateCalculator::calculateUnitRate(URCData dataSet)
     for(resorcePtr = dataSet.resources.begin() ; resorcePtr< end; ++resorcePtr){
 
         ID = (*resorcePtr).ID;
-        RsrcAtDB = storageManager->getResource(ID);
+        RsrcAtDB = pStorageManager->getResource(ID);
 
-        if(RsrcAtDB.ID != storageManager->INVALID_Item_ID){
+        if(RsrcAtDB.ID != pStorageManager->INVALID_Item_ID){
             //TODO: NO CHECK FOR COMPATIBILTY DONE (unit comparison of xml file and DB should be done)
             rate += (*resorcePtr).quantity * (RsrcAtDB.rate/RsrcAtDB.quantity);
 

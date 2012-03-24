@@ -26,7 +26,7 @@ ResourceDataBrowser::ResourceDataBrowser(StorageManager &storageManager, QWidget
     ui(new Ui::ResourceDataBrowser)
 {
     ui->setupUi(this);
-    this->storageManager = &storageManager;
+    this->pStorageManagerAct = &storageManager;
     setWindowTitle(tr("Resource Data Browser"));
 
     initActions();
@@ -45,17 +45,17 @@ void ResourceDataBrowser::on_closeButton_clicked()
 
 void ResourceDataBrowser::on_AddResourceButton_clicked()
 {
-    AddResource rsrsForm(*storageManager);
+    AddResource rsrsForm(*pStorageManagerAct);
     rsrsForm.exec();
 }
 
 void ResourceDataBrowser::setupResourceTable()
 {
-    model = new QSqlTableModel(this);
-    model->setTable("resource");
-    model->select();
-    model->removeColumn(0);
-    ui->tableView->setModel(model);
+    pModel = new QSqlTableModel(this);
+    pModel->setTable("resource");
+    pModel->select();
+    pModel->removeColumn(0);
+    ui->tableView->setModel(pModel);
     ui->tableView->resizeColumnsToContents();
     ui->tableView->resizeRowsToContents();
     ui->tableView->horizontalHeader()->setStretchLastSection(true);
@@ -72,17 +72,17 @@ void ResourceDataBrowser::fillUIData()
 
 void ResourceDataBrowser::initActions()
 {
-    removeResource = new QAction(tr("Remove Resource"), this);
-    addResource = new QAction(tr("Add Resource"), this);
-    editResource = new QAction(tr("Edit Resource"), this);
+    pRemoveResourceAct = new QAction(tr("Remove Resource"), this);
+    pAddResourceAct = new QAction(tr("Add Resource"), this);
+    pEditResourceAct = new QAction(tr("Edit Resource"), this);
 
-    ui->tableView->addAction(addResource);
-    ui->tableView->addAction(editResource);
-    ui->tableView->addAction(removeResource);
+    ui->tableView->addAction(pAddResourceAct);
+    ui->tableView->addAction(pEditResourceAct);
+    ui->tableView->addAction(pRemoveResourceAct);
 
     ui->tableView->setContextMenuPolicy(Qt::ActionsContextMenu);
     ui->tableView->setAlternatingRowColors(true);
-    connect(removeResource, SIGNAL(triggered()), this, SLOT(removeSelectedResource()));
+    connect(pRemoveResourceAct, SIGNAL(triggered()), this, SLOT(removeSelectedResource()));
 
 }
 

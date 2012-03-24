@@ -30,7 +30,8 @@ HEADERS += addons/printview.h \
            storage/xmlrenderer.h \
            storage/xmlwriter.h \
     core/boqdelegate.h \
-    gui/resourcedatabrowser.h
+    gui/resourcedatabrowser.h \
+    core/boqtablemodel.h
 
 FORMS += core/worksheetwidget.ui \
          gui/aboutdialog.ui \
@@ -58,4 +59,5 @@ SOURCES += addons/printview.cpp \
            storage/xmlrenderer.cpp \
            storage/xmlwriter.cpp \
     core/boqdelegate.cpp \
-    gui/resourcedatabrowser.cpp
+    gui/resourcedatabrowser.cpp \
+    core/boqtablemodel.cpp

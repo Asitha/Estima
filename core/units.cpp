@@ -75,7 +75,7 @@ QStringList Units::getUnitSystems()
 
 void Units::setStorageManager(StorageManager &storageManager)
 {
-    this->storageManager = &storageManager;
+    this->pStorageManager = &storageManager;
 }
 
 

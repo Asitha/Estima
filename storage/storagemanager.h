@@ -65,8 +65,8 @@ public:
 
 private:
 
-    DBManager *dbManager;
-    XMLRenderer *xmlRenderer;
+    DBManager *pDBManager;
+    XMLRenderer *pXMLRenderer;
 
 
 

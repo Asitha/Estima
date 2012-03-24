@@ -62,12 +62,7 @@ int main(int argc, char *argv[])
     estima.show();
 //    testDB();
 
-    QDate  date;
-    QString d1 = date.currentDate().toString("dd-MMM-yyyy");
-    qDebug() << d1;
-    QDate date2;
-    date2 = date2.fromString("25Mar2012", "ddMMMyyyy");
-    qDebug() << date2.currentDate();
+
 
     return app.exec();
 }

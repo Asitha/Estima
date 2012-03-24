@@ -38,19 +38,19 @@ class UnitRateCalculator : public QObject
 {
     Q_OBJECT
 public:
-    explicit UnitRateCalculator(StorageManager& storageManager, QObject *parent = 0);
+    explicit UnitRateCalculator(StorageManager& pStorageManager, QObject *parent = 0);
     CalcData getUnitRate(QString& refNum, float& markup);
     CalcData getUnitRate(URCData urcData, float& markup);
     // should be changed to this
     //  float getUnitRate(QString refNum, float markup, QString *errorMsg);
-    void setStorageManager(StorageManager& storageManager);
+    void setStorageManager(StorageManager& pStorageManager);
 
 signals:
 
 public slots:
 private:
     float calculateUnitRate(URCData dataSet);
-    StorageManager *storageManager;
+    StorageManager *pStorageManager;
     CalcData calcData;
 };
 

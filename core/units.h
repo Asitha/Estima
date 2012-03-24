@@ -55,7 +55,7 @@ private:
     Units(QObject *parent = 0);
 
     static Units *pInstance;
-    StorageManager *storageManager;
+    StorageManager *pStorageManager;
     QStringList stdUnits;
     QStringList nonStdUnits;
     QStringList unitSystems;

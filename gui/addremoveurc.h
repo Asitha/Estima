@@ -37,7 +37,7 @@ class AddRemoveURC : public QDialog
     Q_OBJECT
 
 public:
-    explicit AddRemoveURC(StorageManager *storageManager,BOQGenerator *boqGenerator, QWidget *parent = 0);
+    explicit AddRemoveURC(StorageManager *pStorageManager,BOQGenerator *pBOQGenerator, QWidget *parent = 0);
     ~AddRemoveURC();
     bool fillData(Item item);
 
@@ -60,16 +60,16 @@ private slots:
     void removeRow();
 
 private:
-    QAction *removeResourceAct;
+    QAction *pRemoveResourceAct;
 
-    StorageManager *storageManager;
-    BOQGenerator *boqGenerator;
+    StorageManager *pStorageManager;
+    BOQGenerator *pBOQGenerator;
     Ui::AddRemoveURC *ui;
-    Units *units;
+    Units *pUnits;
     URCData urcData;
 
-    QCompleter *itemCompleter;
-    QCompleter *resourceCompleter;
+    QCompleter *pItemCompleter;
+    QCompleter *pResourceCompleter;
     QSqlQueryModel itemModel;
     QSqlQueryModel resourceModel;
 

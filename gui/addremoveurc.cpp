@@ -25,8 +25,8 @@ AddRemoveURC::AddRemoveURC(StorageManager *storageManager,BOQGenerator *boqGener
     ui(new Ui::AddRemoveURC)
 {
     ui->setupUi(this);
-    this->storageManager = storageManager;
-    this->boqGenerator =  boqGenerator;
+    this->pStorageManager = storageManager;
+    this->pBOQGenerator =  boqGenerator;
     setWindowTitle(tr("unit rate calculation properties"));
 
     ui->convConstSpinBox->setMaximum(1000000);
@@ -47,7 +47,7 @@ void AddRemoveURC::on_AddRsrcPushButton_clicked()
 {
     ResourceURC rsrcURC;
     rsrcURC.name = ui->rsrcNamelineEdit->text();
-    QList<Resource> list = storageManager->getResource(rsrcURC.name);
+    QList<Resource> list = pStorageManager->getResource(rsrcURC.name);
 
 
     if(!list.isEmpty() && list.first().ID != StorageManager::INVALID_Resource_ID){
@@ -69,7 +69,7 @@ void AddRemoveURC::on_URCEditButtonBox_accepted()
 {
     QString itemDesc = ui->itemlineEdit->text();
 
-    item =  storageManager->getItem(itemDesc);
+    item =  pStorageManager->getItem(itemDesc);
     if(item.ID != StorageManager::INVALID_Item_ID){
 
         urcData.convConst = ui->convConstSpinBox->value();
@@ -82,7 +82,7 @@ void AddRemoveURC::on_URCEditButtonBox_accepted()
             QMessageBox::warning(this, tr("No Resources added"),
                tr("Please add resources before saving unit rate calculation"));
         }else{
-            storageManager->saveURC(item.refNum, urcData);
+            pStorageManager->saveURC(item.refNum, urcData);
             qDebug("URC data stored");
         }
     }else{
@@ -101,7 +101,7 @@ void AddRemoveURC::on_URCEditButtonBox_rejected()
 
 bool AddRemoveURC::fillData(Item item)
 {
-    urcData = storageManager->retrieveURC(item.refNum);
+    urcData = pStorageManager->retrieveURC(item.refNum);
 
     if(urcData.itemID != StorageManager::INVALID_Item_ID){
         ui->itemlineEdit->setText(item.description);
@@ -115,8 +115,9 @@ bool AddRemoveURC::fillData(Item item)
         foreach(ResourceURC resrcURC, urcData.resources){
             addToURCTable(resrcURC);
         }
+        return true;
     }
-
+    return false;
 }
 
 void AddRemoveURC::on_itemlineEdit_editingFinished()
@@ -129,11 +130,11 @@ void AddRemoveURC::on_itemlineEdit_editingFinished()
 void AddRemoveURC::fillUIData()
 {
     // combo box data
-    units = Units::getInstance();
-    ui->calcUnitComboBox->addItems(units->getUnits());
+    pUnits = Units::getInstance();
+    ui->calcUnitComboBox->addItems(pUnits->getUnits());
     ui->calcUnitComboBox->setDuplicatesEnabled(false);
 
-    ui->stdUnitComboBox->addItems(units->getStdUnits());
+    ui->stdUnitComboBox->addItems(pUnits->getStdUnits());
     ui->stdUnitComboBox->setDuplicatesEnabled(false);
 }
 
@@ -143,7 +144,7 @@ void AddRemoveURC::on_rsrcNamelineEdit_editingFinished()
 {
 
     QString resourceName = ui->rsrcNamelineEdit->text();
-    QList<Resource> list = storageManager->getResource(resourceName);
+    QList<Resource> list = pStorageManager->getResource(resourceName);
     if(!list.isEmpty()){
        ui->rsrcUnitLabel->setText(list.first().unit);
     }
@@ -207,8 +208,8 @@ bool AddRemoveURC::addToURCTable(ResourceURC rsrcURCData)
 {
     QTableWidgetItem *items[6];
 
-    Resource rsrc = storageManager->getResource(rsrcURCData.ID);
-    CalcData calcData = boqGenerator->getUnitRate(urcData);
+    Resource rsrc = pStorageManager->getResource(rsrcURCData.ID);
+    CalcData calcData = pBOQGenerator->getUnitRate(urcData);
     ui->stdUnitRateLabel->setText(QString("Standard unit rate(with markup)"
                               " : %1").arg(calcData.unitRate));
 
@@ -244,8 +245,8 @@ void AddRemoveURC::setupCompleters()
     itemModel.setQuery("SELECT ID, Description FROM item");
     QTreeView *treeView =  new QTreeView;
 
-    itemCompleter = new QCompleter(&itemModel,this);
-    itemCompleter->setPopup(treeView);
+    pItemCompleter = new QCompleter(&itemModel,this);
+    pItemCompleter->setPopup(treeView);
     treeView->setRootIsDecorated(false);
     treeView->header()->hide();
     treeView->header()->setStretchLastSection(false);
@@ -253,17 +254,17 @@ void AddRemoveURC::setupCompleters()
     treeView->header()->setResizeMode(0, QHeaderView::Fixed);
     treeView->header()->setResizeMode(1, QHeaderView::Stretch);
 
-    itemCompleter->setCaseSensitivity(Qt::CaseInsensitive);
-    itemCompleter->setCompletionColumn(1);
-    itemCompleter->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
-    ui->itemlineEdit->setCompleter(itemCompleter);
+    pItemCompleter->setCaseSensitivity(Qt::CaseInsensitive);
+    pItemCompleter->setCompletionColumn(1);
+    pItemCompleter->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
+    ui->itemlineEdit->setCompleter(pItemCompleter);
 
 
 
     QTreeView *resTreeView = new QTreeView ;
     resourceModel.setQuery("SELECT ID, NAME From resource");
-    resourceCompleter = new QCompleter(&resourceModel, this);
-    resourceCompleter->setPopup(resTreeView);
+    pResourceCompleter = new QCompleter(&resourceModel, this);
+    pResourceCompleter->setPopup(resTreeView);
     resTreeView->setRootIsDecorated(false);
     resTreeView->header()->hide();
     resTreeView->header()->setStretchLastSection(false);
@@ -272,11 +273,11 @@ void AddRemoveURC::setupCompleters()
     resTreeView->header()->setResizeMode(1, QHeaderView::Stretch);
 
 
-    resourceCompleter->setCompletionRole(Qt::DisplayRole);
-    resourceCompleter->setCompletionColumn(1);
-    resourceCompleter->setCaseSensitivity(Qt::CaseInsensitive);
-    resourceCompleter->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
-    ui->rsrcNamelineEdit->setCompleter(resourceCompleter);
+    pResourceCompleter->setCompletionRole(Qt::DisplayRole);
+    pResourceCompleter->setCompletionColumn(1);
+    pResourceCompleter->setCaseSensitivity(Qt::CaseInsensitive);
+    pResourceCompleter->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
+    ui->rsrcNamelineEdit->setCompleter(pResourceCompleter);
 
 }
 
@@ -316,7 +317,7 @@ QList<ResourceURC> AddRemoveURC::getTableData()
 void AddRemoveURC::ShowItemData()
 {
     urcData.resources.clear();
-    Item item = storageManager->getItem(ui->itemlineEdit->text());
+    Item item = pStorageManager->getItem(ui->itemlineEdit->text());
     if(item.ID != StorageManager::INVALID_Item_ID){
         firstBlankRow = 0;
         clearTable();
@@ -329,11 +330,11 @@ void AddRemoveURC::ShowItemData()
   */
 void AddRemoveURC::createContextMenu()
 {
-    removeResourceAct = new QAction("Remove resource", this);
-    ui->URCTableWidget->addAction(removeResourceAct);
+    pRemoveResourceAct = new QAction("Remove resource", this);
+    ui->URCTableWidget->addAction(pRemoveResourceAct);
 
     ui->URCTableWidget->setContextMenuPolicy(Qt::ActionsContextMenu);
-    connect(removeResourceAct, SIGNAL(triggered()), this, SLOT(removeRow()));
+    connect(pRemoveResourceAct, SIGNAL(triggered()), this, SLOT(removeRow()));
 }
 
 

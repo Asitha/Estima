@@ -27,7 +27,7 @@ AddResource::AddResource(StorageManager &storageManager, QWidget *parent) :
     ui(new Ui::AddResource)
 {
     ui->setupUi(this);
-    this->storageManager = &storageManager;
+    this->pStorageManager = &storageManager;
     setWindowTitle(tr("Resource Properties"));
     fillUIData();
 
@@ -55,7 +55,7 @@ void AddResource::on_applyButton_clicked()
         rsrc.rate = ui->rateDoubleSpinBox->value();
         QDate  date;
         rsrc.lastModified = date.currentDate().toString("dd-MMM-yyyy");
-        storageManager->addResource(rsrc);
+        pStorageManager->addResource(rsrc);
         this->close();
     }else{
         QMessageBox::warning(this, tr("Invalid Input"), errMsg);

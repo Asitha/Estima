@@ -45,9 +45,9 @@ class BOQGenerator : public QObject
     Q_OBJECT
 public:
     // singleton needed
-     explicit BOQGenerator(StorageManager& storageManagerPtr, QObject *parent = 0);
+     explicit BOQGenerator(StorageManager& pStorageManager, QObject *parent = 0);
      void setItem(QString itemName);
-     void setStorageManager(StorageManager& storageManagerPtr);
+     void setStorageManager(StorageManager& pStorageManager);
      BOQItem getItemData(QString itemDesc, float qty);
      void setMarkup(float markup);
      ~BOQGenerator();
@@ -56,8 +56,8 @@ public:
 public slots:
 
 private:
-    StorageManager *storageManagerPtr;
-    UnitRateCalculator *URCalcPtr;
+    StorageManager *pStorageManager;
+    UnitRateCalculator *pURCalc;
 
     float MARKUP;
 };

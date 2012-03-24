@@ -67,16 +67,16 @@ private:
 
     // variables
     Ui::MainWindow *ui;
-    WorkSheetWidget *currentSheet;
-    XMLRenderer *xmlRenderer;
+    WorkSheetWidget *pCurrentSheet;
+    XMLRenderer *pXMLRenderer;
     SQLiteDBManager sqliteDBM;
     MySQLConnector mySQLDBM;
     static int sheetCount;
-    ProjectPropertiesForm *newProjForm ;
+    ProjectPropertiesForm *pNewProjForm ;
     QString version;
 
-    StorageManager *storageManager;
-    QDialog *dlg;
+    StorageManager *pStorageManager;
+    QDialog *pDlg;
     QList<WorkSheetWidget> workSpaces;
 };
 

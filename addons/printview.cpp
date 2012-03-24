@@ -30,7 +30,7 @@ PrintView::PrintView(QWidget *parent) :
 void PrintView::print(QPrinter *printer)
 {
 #ifndef QT_NO_PRINTER
-    resize(printer->width(), printer->height());
+     resize(printer->width(), printer->height());
      render(printer);
 #endif
 }

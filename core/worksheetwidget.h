@@ -22,6 +22,7 @@
 #include "core/boqgenerator.h"
 #include "core/CoreStructures.h"
 #include "core/boqdelegate.h"
+#include "core/boqtablemodel.h"
 
 #include <QDialog>
 #include <QtCore>
@@ -41,11 +42,11 @@ class WorkSheetWidget : public QDialog
 
 
 public:
-    explicit WorkSheetWidget(ProjData projData, StorageManager& storageManager, QWidget *parent = 0);
+    explicit WorkSheetWidget(ProjData projData, StorageManager& pStorageManager, QWidget *parent = 0);
     void setTabIndex(int index);
     int getTabIndex();
     ~WorkSheetWidget();
-    void setStorageManager(StorageManager& storageManager);
+    void setStorageManager(StorageManager& pStorageManager);
 
 
 private slots:
@@ -74,19 +75,25 @@ private:
     BOQDelegate boqItemDelgate;
 
     Ui::WorkSheetWidget *ui;
-    StorageManager *storageManager;
-    BOQGenerator *boqGenerator;
-    QStandardItemModel *model;   
-    QCompleter *itemCompleter, *categoryCompleter;
+    StorageManager *pStorageManager;
+    BOQGenerator *pBOQGenerator;
+//    QStandardItemModel *model;
+    BOQTableModel *pBOQTableModel;
 
-    QAction *addRowAbove ;
-    QAction *addRowBelow;
+    QCompleter *pItemCompleter, *pCategoryCompleter;
+
+    QAction *pAddRowAboveAct ;
+    QAction *pAddRowBelowAct;
+    QAction *pRemoveRowAct;
+    QAction *pCutAct;
+    QAction *pPasteAct;
 
     void creatContextMenu();
     void addBOQItem(BOQItem &boqItem);
     void showError(const QString errorMsg);
     void setupCompleters();
     void setupBOQTable();
+    QTextDocument* createTextDocument();
 
 };
 

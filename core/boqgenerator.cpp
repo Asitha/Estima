@@ -20,8 +20,8 @@
 BOQGenerator::BOQGenerator(StorageManager& storageManager ,QObject *parent) :
     QObject(parent)
 {
-    this->storageManagerPtr = &storageManager;
-    URCalcPtr = new UnitRateCalculator(storageManager);
+    this->pStorageManager = &storageManager;
+    pURCalc = new UnitRateCalculator(storageManager);
     MARKUP = 0.3;
 }
 void BOQGenerator::setItem(QString itemName)
@@ -31,8 +31,8 @@ void BOQGenerator::setItem(QString itemName)
 
 void BOQGenerator::setStorageManager(StorageManager& storageManager)
 {
-    this->storageManagerPtr = &storageManager;
-    this->URCalcPtr->setStorageManager(storageManager);
+    this->pStorageManager = &storageManager;
+    this->pURCalc->setStorageManager(storageManager);
 
 }
 
@@ -42,19 +42,19 @@ void BOQGenerator::setStorageManager(StorageManager& storageManager)
   */
 BOQItem BOQGenerator::getItemData(QString itemDesc, float qty)
 {
-     Item item = storageManagerPtr->getItem(itemDesc);
+     Item item = pStorageManager->getItem(itemDesc);
 
     BOQItem boqItem;
     boqItem.qty= qty;
     boqItem.itemStruct = item;
 
-    if(item.ID != storageManagerPtr->INVALID_Item_ID){
+    if(item.ID != pStorageManager->INVALID_Item_ID){
         // calculate unit rate
-        boqItem.unitRate = URCalcPtr->getUnitRate(boqItem.itemStruct.refNum, MARKUP).unitRate;
+        boqItem.unitRate = pURCalc->getUnitRate(boqItem.itemStruct.refNum, MARKUP).unitRate;
 
         if(boqItem.unitRate < 0){
             //TODO: option should be given to edit unit rate calculation
-            boqItem.itemStruct.ID = storageManagerPtr->INVALID_Item_ID;
+            boqItem.itemStruct.ID = pStorageManager->INVALID_Item_ID;
             qDebug("error in unit rate calculation");
         }else{
             // calculate the amount
@@ -67,12 +67,12 @@ BOQItem BOQGenerator::getItemData(QString itemDesc, float qty)
 
 BOQGenerator::~BOQGenerator()
 {
-    delete URCalcPtr;
+    delete pURCalc;
 }
 
 CalcData BOQGenerator::getUnitRate(URCData urcData)
 {
-    return URCalcPtr->getUnitRate(urcData, MARKUP);
+    return pURCalc->getUnitRate(urcData, MARKUP);
 }
 
 void BOQGenerator::setMarkup(float markup)

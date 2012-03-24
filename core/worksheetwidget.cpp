@@ -22,6 +22,7 @@
 
 #include <QDebug>
 #include <QPrinter>
+#include <QTextCharFormat>
 
 
 WorkSheetWidget::WorkSheetWidget(ProjData projData, StorageManager& storageManager, QWidget *parent) :
@@ -29,10 +30,10 @@ WorkSheetWidget::WorkSheetWidget(ProjData projData, StorageManager& storageManag
     ui(new Ui::WorkSheetWidget)
 {
     ui->setupUi(this);
-    this->storageManager = &storageManager;
+    this->pStorageManager = &storageManager;
     this->boqData.projectData =  projData;
-    this->boqGenerator = new BOQGenerator(storageManager,this);
-    boqGenerator->setMarkup(projData.markup);
+    this->pBOQGenerator = new BOQGenerator(storageManager,this);
+    pBOQGenerator->setMarkup(projData.markup);
     setupBOQTable();
     setupCompleters();
     creatContextMenu();
@@ -41,7 +42,7 @@ WorkSheetWidget::WorkSheetWidget(ProjData projData, StorageManager& storageManag
 WorkSheetWidget::~WorkSheetWidget()
 {
     delete ui;
-    delete model;
+    delete pBOQTableModel;
 }
 
 void WorkSheetWidget::on_addItemButton_clicked()
@@ -50,14 +51,14 @@ void WorkSheetWidget::on_addItemButton_clicked()
     QString searchItem = ui->ItemEdit->text();
     float qty = ui->quantitySpinBox->value();
     if(qty > 0){
-        BOQItem boqItem = boqGenerator->getItemData(searchItem, qty);
-        if(boqItem.itemStruct.ID != storageManager->INVALID_Item_ID){
+        BOQItem boqItem = pBOQGenerator->getItemData(searchItem, qty);
+        if(boqItem.itemStruct.ID != pStorageManager->INVALID_Item_ID){
              addBOQItem(boqItem);
         }else{
             showError("Error...can't add... ");
         }
     }else
-        QMessageBox::warning(this,"Invalid Quatity", "Please enter a valid quantity" );
+        QMessageBox::warning(this,"Invalid Quatity", "<p>Enter a non zero value for quantity</p>" );
 
 
 }
@@ -74,33 +75,30 @@ int WorkSheetWidget::getTabIndex()
 
 void WorkSheetWidget::setStorageManager(StorageManager& storageManager)
 {
-    this->storageManager = &storageManager;
+    this->pStorageManager = &storageManager;
 }
 
 
 
 void WorkSheetWidget::addBOQItem(BOQItem &boqItem)
 {
-    QStandardItem *item = model->item(0,0);
-    model->appendRow(item);
 
-
-    QModelIndex index= model->index(currentRow   ,   0, QModelIndex());
-    model->setData(index, boqItem.itemStruct.refNum);
-    index= model->index(currentRow   ,   1, QModelIndex());
-    model->setData(index, boqItem.itemStruct.description);
-    index= model->index(currentRow    ,   2, QModelIndex());
-    model->setData(index, QString().setNum(boqItem.qty, 'f', 2));
-    index= model->index(currentRow    ,   3, QModelIndex());
-    model->setData(index, boqItem.itemStruct.unit);
-    index= model->index(currentRow    ,   4, QModelIndex());
-    model->setData(index, QString().setNum(boqItem.unitRate,'f', 2));
-    index= model->index(currentRow    ,   5, QModelIndex());
-    model->setData(index, QString().setNum(boqItem.amount, 'f', 2));
+    QModelIndex index= pBOQTableModel->index(currentRow   ,   0, QModelIndex());
+    pBOQTableModel->setData(index, boqItem.itemStruct.refNum);
+    index= pBOQTableModel->index(currentRow   ,   1, QModelIndex());
+    pBOQTableModel->setData(index, boqItem.itemStruct.description);
+    index= pBOQTableModel->index(currentRow    ,   2, QModelIndex());
+    pBOQTableModel->setData(index, QString().setNum(boqItem.qty, 'f', 2));
+    index= pBOQTableModel->index(currentRow    ,   3, QModelIndex());
+    pBOQTableModel->setData(index, boqItem.itemStruct.unit);
+    index= pBOQTableModel->index(currentRow    ,   4, QModelIndex());
+    pBOQTableModel->setData(index, QString().setNum(boqItem.unitRate,'f', 2));
+    index= pBOQTableModel->index(currentRow    ,   5, QModelIndex());
+    pBOQTableModel->setData(index, QString().setNum(boqItem.amount, 'f', 2));
     ui->tableView->resizeRowToContents(currentRow);
     currentRow++;
 
-    boqData.itemList.append(boqItem);
+
 
 }
 
@@ -113,8 +111,8 @@ void WorkSheetWidget::showError(const QString errorMsg)
 
 void WorkSheetWidget::on_pushButton_3_clicked()
 {
-    AddRemoveURC urcEdit(storageManager, boqGenerator);
-    Item item = storageManager->getItem(ui->ItemEdit->text());
+    AddRemoveURC urcEdit(pStorageManager, pBOQGenerator);
+    Item item = pStorageManager->getItem(ui->ItemEdit->text());
     if(item.ID != StorageManager::INVALID_Item_ID){
         urcEdit.fillData(item);}
     urcEdit.exec();
@@ -135,23 +133,27 @@ void WorkSheetWidget::on_categoryEdit_lostFocus()
 
 void WorkSheetWidget::on_reset_Button_clicked()
 {
-#ifndef QT_NO_PRINTER
+//#ifndef QT_NO_PRINTER
      QPrinter printer(QPrinter::ScreenResolution);
-     QPrintPreviewDialog dlg(&printer);
-     PrintView view;
-     view.setModel(ui->tableView->model());
-     connect(&dlg, SIGNAL(paintRequested(QPrinter*)),
-             &view, SLOT(print(QPrinter*)));
+     QPrintDialog dlg(&printer);
+//     PrintView view;
+//     view.setModel(ui->tableView->model());
+//     connect(&dlg, SIGNAL(paintRequested(QPrinter*)),
+//             &view, SLOT(print(QPrinter*)));
+//
      dlg.exec();
-#endif
+     createTextDocument()->print(&printer);
+//#endif
+
+
 }
 
 void WorkSheetWidget::setupCompleters()
 {
     QTreeView *itemTreeView =  new QTreeView;
     itemModel.setQuery("SELECT ID, Description FROM item");
-    itemCompleter = new QCompleter(&itemModel,this);
-    itemCompleter->setPopup(itemTreeView);
+    pItemCompleter = new QCompleter(&itemModel,this);
+    pItemCompleter->setPopup(itemTreeView);
     itemTreeView->setRootIsDecorated(false);
     itemTreeView->header()->hide();
     itemTreeView->header()->setStretchLastSection(false);
@@ -159,25 +161,25 @@ void WorkSheetWidget::setupCompleters()
     itemTreeView->header()->setResizeMode(0, QHeaderView::Fixed);
     itemTreeView->header()->setResizeMode(1, QHeaderView::ResizeToContents);
 
-    itemCompleter->setCaseSensitivity(Qt::CaseInsensitive);
-    itemCompleter->setCompletionColumn(1);
-    itemCompleter->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
-    ui->ItemEdit->setCompleter(itemCompleter);
+    pItemCompleter->setCaseSensitivity(Qt::CaseInsensitive);
+    pItemCompleter->setCompletionColumn(1);
+    pItemCompleter->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
+    ui->ItemEdit->setCompleter(pItemCompleter);
 
     QTreeView *categoryTreeView =  new QTreeView;
     categoryModel.setQuery("SELECT ID, Name FROM category");
-    categoryCompleter = new QCompleter(&categoryModel, this);
-    categoryCompleter->setPopup(categoryTreeView);
+    pCategoryCompleter = new QCompleter(&categoryModel, this);
+    pCategoryCompleter->setPopup(categoryTreeView);
     categoryTreeView->setRootIsDecorated(false);
     categoryTreeView->header()->hide();
     categoryTreeView->header()->setStretchLastSection(false);
     categoryTreeView->header()->resizeSection(0, 0);
     categoryTreeView->header()->setResizeMode(0, QHeaderView::Fixed);
     categoryTreeView->header()->setResizeMode(1, QHeaderView::ResizeToContents);
-    categoryCompleter->setCompletionColumn(1);
-    categoryCompleter->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
-    categoryCompleter->setCaseSensitivity(Qt::CaseInsensitive);
-    ui->categoryEdit->setCompleter(categoryCompleter);
+    pCategoryCompleter->setCompletionColumn(1);
+    pCategoryCompleter->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
+    pCategoryCompleter->setCaseSensitivity(Qt::CaseInsensitive);
+    ui->categoryEdit->setCompleter(pCategoryCompleter);
 
 
 }
@@ -198,8 +200,8 @@ void WorkSheetWidget::on_ItemEdit_textEdited(const QString &arg1)
 void WorkSheetWidget::setupBOQTable()
 {
     currentRow = 0;
-    model = new QStandardItemModel(25, 6, this);
-    ui->tableView->setModel(model);
+    pBOQTableModel = new BOQTableModel(25,  this);
+    ui->tableView->setModel(pBOQTableModel);
     ui->tableView->setColumnWidth(0, 80);
     ui->tableView->setColumnWidth(1, 300);
     ui->tableView->setColumnWidth(2, 100);
@@ -209,13 +211,7 @@ void WorkSheetWidget::setupBOQTable()
     ui->tableView->setItemDelegate(&boqItemDelgate);
     ui->tableView->horizontalHeader()->setStretchLastSection(true);
 
-
-    connect(ui->tableView, SIGNAL(pressed(QModelIndex)), this, SLOT(showPopupMenu(QModelIndex )));
-    QStringList headers;
-    headers << "Ref No" << "Description"<< "Qty"<< "Unit" << "Rate"<< "Amount";
-    model->setHorizontalHeaderLabels(headers);
-    ui->tableView->horizontalHeader()->stretchLastSection();
-
+    ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
 
 }
 
@@ -236,9 +232,59 @@ void WorkSheetWidget::showPopupMenu(QModelIndex index)
 
 void WorkSheetWidget::creatContextMenu()
 {
-    addRowAbove = new QAction("Add row above", this);
-    addRowBelow = new QAction("Add row Below", this);
-    ui->tableView->addAction(addRowAbove);
-    ui->tableView->addAction(addRowBelow);
+    pAddRowAboveAct = new QAction("Add row above", this);
+    pAddRowBelowAct = new QAction("Add row Below", this);
+    pRemoveRowAct   = new QAction("Remove Selected", this);
+    pCutAct   = new QAction("Cut", this);
+    pPasteAct   = new QAction("Paste", this);
+
+    ui->tableView->addAction(pAddRowAboveAct);
+    ui->tableView->addAction(pAddRowBelowAct);
+    ui->tableView->addAction(pRemoveRowAct);
+    ui->tableView->addAction(pCutAct);
+    ui->tableView->addAction(pPasteAct);
+
     ui->tableView->setContextMenuPolicy(Qt::ActionsContextMenu);
+}
+
+QTextDocument* WorkSheetWidget::createTextDocument()
+{
+    QTextDocument *document = new QTextDocument(this) ;
+    document->clear();
+    QTextCursor cursor(document);
+
+    cursor.insertText("BOQ Header");
+
+    QList<TableItem > *pItemList = ((BOQTableModel *)ui->tableView->model())->getTableData();
+    // create Table
+    int rowCount = ui->tableView->model()->rowCount();
+    int columnCount = ui->tableView->model()->columnCount();
+    QTextTableFormat tableFormat;
+    QVector<QTextLength> constraints;
+         constraints << QTextLength(QTextLength::PercentageLength, 10);
+         constraints << QTextLength(QTextLength::PercentageLength, 45);
+         constraints << QTextLength(QTextLength::PercentageLength, 10);
+         constraints << QTextLength(QTextLength::PercentageLength, 10);
+         constraints << QTextLength(QTextLength::PercentageLength, 10);
+         constraints << QTextLength(QTextLength::PercentageLength, 15);
+    tableFormat.setColumnWidthConstraints(constraints);
+
+    QTextTable *pTextTable = cursor.insertTable(rowCount, columnCount, tableFormat);
+    QTextTableCell *pCell;
+    for(int i = 0; i < rowCount; i++){
+        cursor = pTextTable->cellAt(i, 0).firstCursorPosition();
+        cursor.insertText(pItemList->at(i).refNum);
+        cursor = pTextTable->cellAt(i, 1).firstCursorPosition();
+        cursor.insertText(pItemList->at(i).description);
+        cursor = pTextTable->cellAt(i, 2).firstCursorPosition();
+        cursor.insertText(pItemList->at(i).qty);
+        cursor = pTextTable->cellAt(i, 3).firstCursorPosition();
+        cursor.insertText(pItemList->at(i).unit);
+        cursor = pTextTable->cellAt(i, 4).firstCursorPosition();
+        cursor.insertText(pItemList->at(i).rate);
+        cursor = pTextTable->cellAt(i, 5).firstCursorPosition();
+        cursor.insertText(pItemList->at(i).amount);
+    }
+
+    return document;
 }

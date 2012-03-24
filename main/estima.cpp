@@ -53,16 +53,16 @@ Estima::~Estima()
 {
 
     delete ui;
-    delete xmlRenderer;
-    delete storageManager;
+    delete pXMLRenderer;
+    delete pStorageManager;
 
 }
 
 void Estima::on_actionNew_Project_triggered()
 {
-    newProjForm = new ProjectPropertiesForm(this);
-    connect(newProjForm, SIGNAL(newProjData(ProjData)), this, SLOT(createNewPoject(ProjData)));
-    newProjForm->exec();
+    pNewProjForm = new ProjectPropertiesForm(this);
+    connect(pNewProjForm, SIGNAL(newProjData(ProjData)), this, SLOT(createNewPoject(ProjData)));
+    pNewProjForm->exec();
 
 
 
@@ -96,7 +96,7 @@ void Estima::removeSheet(WorkSheetWidget* worksheet)
 void Estima::init()
 {
     // default xmlrenderer
-    xmlRenderer = new XMLRenderer(this);
+    pXMLRenderer = new XMLRenderer(this);
 
     /*
     // setup storageManager for sqlite
@@ -105,13 +105,13 @@ void Estima::init()
     storageManager->createConnection("root","","127.0.0.1","estima");*/
 
     // setup storageManager for mysql
-    storageManager = new StorageManager(mySQLDBM, *xmlRenderer, this);
-    if(!storageManager->createConnection("root","","127.0.0.1","estima")){
+    pStorageManager = new StorageManager(mySQLDBM, *pXMLRenderer, this);
+    if(!pStorageManager->createConnection("root","","127.0.0.1","estima")){
         // code to configure sql db
         QMessageBox::warning(this,tr("Estima"), tr("Couldn't connect to database")  );
         qDebug("couldn't connect");
     }else{
-        Units::getInstance()->setStorageManager(*storageManager);
+        Units::getInstance()->setStorageManager(*pStorageManager);
     }
 }
 
@@ -131,10 +131,10 @@ void Estima::closeTab(int i)
 void Estima::createNewPoject(ProjData projData)
 {
     // delete the form before opening the worksheet;
-    delete newProjForm;
+    delete pNewProjForm;
 
-    currentSheet = new WorkSheetWidget(projData, *storageManager, this);
-    addNewSheet(*currentSheet);
+    pCurrentSheet = new WorkSheetWidget(projData, *pStorageManager, this);
+    addNewSheet(*pCurrentSheet);
 }
 
 void Estima::on_actionAbout_Qt_triggered()
@@ -157,7 +157,7 @@ void Estima::on_actionAbout_Estima_triggered()
 
 void Estima::on_actionResources_triggered()
 {
-    ResourceDataBrowser *browser = new ResourceDataBrowser(*storageManager, this);
+    ResourceDataBrowser *browser = new ResourceDataBrowser(*pStorageManager, this);
     browser->exec();
 
 }

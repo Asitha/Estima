@@ -31,7 +31,7 @@ class AddResource : public QDialog
     Q_OBJECT
 
 public:
-    explicit AddResource(StorageManager &storageManager,QWidget *parent = 0);
+    explicit AddResource(StorageManager &pStorageManager,QWidget *parent = 0);
     ~AddResource();
 
 private slots:
@@ -41,7 +41,7 @@ private slots:
 
 private:
     Ui::AddResource *ui;
-    StorageManager *storageManager;
+    StorageManager *pStorageManager;
 
     bool validateData(QString *errorMessage);
     void fillUIData();

@@ -21,67 +21,67 @@
 StorageManager::StorageManager(DBManager& newDBManager, XMLRenderer& newXMlRenderer, QObject *parent):
     QObject(parent)
 {
-    this->dbManager = &newDBManager;
-    this->xmlRenderer = &newXMlRenderer;
+    this->pDBManager = &newDBManager;
+    this->pXMLRenderer = &newXMlRenderer;
 }
 
 Item StorageManager::getItem(int itemID)
 {
-    return dbManager->getItem(itemID);
+    return pDBManager->getItem(itemID);
 }
 
 Item StorageManager::getItem(QString description)
 {
-    return dbManager->getItem(description);
+    return pDBManager->getItem(description);
 }
 
 void StorageManager::setDBManager(DBManager& newDBManager)
 {
-    this->dbManager = &newDBManager;
+    this->pDBManager = &newDBManager;
 }
 
 void StorageManager::setXMLRenderer(XMLRenderer& newXMLRenderer)
 {
-    this->xmlRenderer= &newXMLRenderer;
+    this->pXMLRenderer= &newXMLRenderer;
 }
 
 bool StorageManager::createConnection(QString userName, QString password, QString hostname, QString Database)
 {
-    return dbManager->createConnection(userName,password,hostname,Database);
+    return pDBManager->createConnection(userName,password,hostname,Database);
 }
 
 void StorageManager::getItemsOf(QString category)
 {
-    dbManager->getItemsof(category);
+    pDBManager->getItemsof(category);
 
 }
 
 void StorageManager::searchItem(QString description)
 {
-    dbManager->searchItem(description);
+    pDBManager->searchItem(description);
 }
 
 void StorageManager::saveURC(QString fileName, const URCData &data)
 {
-    xmlRenderer->saveURC(fileName, data);
+    pXMLRenderer->saveURC(fileName, data);
 }
 
 URCData StorageManager::retrieveURC(QString fileName)
 {
-    return xmlRenderer->retrieveFile(fileName);
+    return pXMLRenderer->retrieveFile(fileName);
 }
 
 Resource StorageManager::getResource(int ID)
 {
-    return dbManager->getResource(ID);
+    return pDBManager->getResource(ID);
 }
 
 QList<Resource> StorageManager::getResource(QString resourceName)
 {
-    return dbManager->getResource(resourceName);
+    return pDBManager->getResource(resourceName);
 }
 
 bool StorageManager::addResource(Resource resource)
 {
-    return dbManager->addResource(resource);
+    return pDBManager->addResource(resource);
 }

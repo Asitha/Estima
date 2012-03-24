@@ -31,7 +31,7 @@ class ResourceDataBrowser : public QDialog
     Q_OBJECT
 
 public:
-    explicit ResourceDataBrowser(StorageManager &storageManager ,QWidget *parent = 0);
+    explicit ResourceDataBrowser(StorageManager &pStorageManagerAct ,QWidget *parent = 0);
     ~ResourceDataBrowser();
 
 private slots:
@@ -47,14 +47,14 @@ private slots:
 
 
 private:
-    QAction *removeResource;
-    QAction *addResource;
-    QAction *editResource;
+    QAction *pRemoveResourceAct;
+    QAction *pAddResourceAct;
+    QAction *pEditResourceAct;
 
-    StorageManager *storageManager;
+    StorageManager *pStorageManagerAct;
     Ui::ResourceDataBrowser *ui;
 
-    QSqlTableModel *model;
+    QSqlTableModel *pModel;
     void setupResourceTable();
     void fillUIData();
     void initActions();
