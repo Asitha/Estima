@@ -19,7 +19,8 @@
 #define CORESTRUCTURES_H
 
 #include <QtCore>
-#include "core/boqgenerator.h"
+#include "storage/item.h"
+
 
 struct ProjData {
 
@@ -32,13 +33,19 @@ struct ProjData {
 
 };
 
+struct BOQTableItem{
+    QString refNum;
+    QString description;
+    QString qty;
+    QString unit;
+    QString rate;
+    QString amount;
+};
 
 
 struct BOQData {
 
-    QList<BOQItem> itemList;
-    int ID;
-    QString name;
+    QList<BOQTableItem> itemList;
     ProjData projectData;
 
 

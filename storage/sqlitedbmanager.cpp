@@ -112,7 +112,7 @@ QList<Item> SQLiteDBManager::processItems(QSqlQuery& query)
         Item tmpItem;
         tmpItem.ID = query.value(0).toInt() ;
         tmpItem.categoryID = query.value(1).toInt() ;
-        tmpItem.formulaID = query.value(2).toInt() ;
+//        tmpItem.formulaID = query.value(2).toInt() ;
         tmpItem.refNum = query.value(3).toString() ;
         tmpItem.description =  query.value(4).toString() ;
         tmpItem.unit = query.value(5).toString() ;

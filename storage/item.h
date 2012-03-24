@@ -37,7 +37,7 @@ struct Item {
     QString description;
     QString unit;
     QString dateModified;
-    int formulaID;
+
 };
 
 /**

@@ -97,16 +97,15 @@ void MySQLConnector::searchItem(QString description)
 QList<Item> MySQLConnector::processItems(QSqlQuery& query)
 {
     QList<Item> items;
-
+    QSqlRecord record = query.record();
     while (query.next()){
         Item tmpItem;
-        tmpItem.ID = query.value(0).toInt() ;
-        tmpItem.categoryID = query.value(1).toInt() ;
-        tmpItem.formulaID = query.value(2).toInt() ;
-        tmpItem.refNum = query.value(3).toString() ;
-        tmpItem.description =  query.value(4).toString() ;
-        tmpItem.unit = query.value(5).toString() ;
-        tmpItem.dateModified = query.value(6).toString() ;
+        tmpItem.ID = query.value(record.indexOf("ID")).toInt() ;
+        tmpItem.categoryID = query.value(record.indexOf("Category_ID")).toInt() ;
+        tmpItem.refNum = query.value(record.indexOf("Reference_No")).toString() ;
+        tmpItem.description =  query.value(record.indexOf("Description")).toString() ;
+        tmpItem.unit = query.value(record.indexOf("Unit")).toString() ;
+        tmpItem.dateModified = query.value(record.indexOf("Date_Created")).toString() ;
         items.append(tmpItem);
     }
     if(items.isEmpty())

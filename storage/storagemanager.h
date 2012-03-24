@@ -48,18 +48,19 @@ public:
     Item getItem(int itemID);
     Item getItem(QString description);
     void searchItem(QString description);
-    void getItemsOf(QString category);
-    URCData retrieveURC(QString fileName);
+    QList<Item> getItemsOf(QString category);
+
     Resource getResource(int ID);
     QList<Resource> getResource(QString resourceName);
     bool addResource(Resource resource);
     bool addItem(Item item);
 
-    // NEED TO IMPLEMENT
-    void save();
-    void load();
+
+    bool saveProject(const QString &filepath, const BOQData &data);
+    BOQData loadProject(const QString &filepath, bool *noError =  new bool(true));
 
     void saveURC(QString fileName,const URCData& data);
+    URCData retrieveURC(QString fileName);
     void setItem();
 
 

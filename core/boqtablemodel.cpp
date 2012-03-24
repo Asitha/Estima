@@ -22,7 +22,7 @@
 BOQTableModel::BOQTableModel(QObject *parent) :
     QAbstractTableModel(parent)
 {
-    pItemList = new QList<TableItem>();
+    pItemList = new QList<BOQTableItem>();
     this->rows = 0;
     this->columns = 6;
 }
@@ -32,9 +32,9 @@ BOQTableModel::BOQTableModel(int rowCount, QObject *parent) :
 {
     this->rows = rowCount;
     this->columns = 6;
-    pItemList = new QList<TableItem>();
+    pItemList = new QList<BOQTableItem>();
     for(int i = 0; i < rowCount; i++){
-        TableItem *item = new TableItem;
+        BOQTableItem *item = new BOQTableItem;
         pItemList->append(*item);
     }
 }
@@ -54,7 +54,7 @@ QVariant BOQTableModel::data(const QModelIndex &index, int role) const
     int row = index.row();
     int col = index.column();
 
-    TableItem item = pItemList->at(index.row());
+    BOQTableItem item = pItemList->at(index.row());
 
     switch(role){
 
@@ -85,7 +85,7 @@ QVariant BOQTableModel::data(const QModelIndex &index, int role) const
         case 3:
         case 4:
         case 5:
-            return Qt::AlignRight;
+            return Qt::AlignBottom + Qt::AlignRight;
         }
     }
 
@@ -150,7 +150,7 @@ bool BOQTableModel::insertRows(int row, int count, const QModelIndex &parent)
         beginInsertRows(parent, firstRow, lastRow);
 
         for(int i = row; i <= lastRow; i++){
-            TableItem *item = new TableItem;
+            BOQTableItem *item = new BOQTableItem;
             pItemList->insert(i, *item);
             ++rows;
         }
@@ -159,7 +159,7 @@ bool BOQTableModel::insertRows(int row, int count, const QModelIndex &parent)
     }else {
         beginInsertRows(parent,firstRow, lastRow);
         for(int i = 0; i <count; i++){
-            TableItem *item = new TableItem;
+            BOQTableItem *item = new BOQTableItem;
             pItemList->append(*item);
             ++rows;
         }
@@ -222,7 +222,7 @@ QString BOQTableModel::toCSV()
 {
 }
 
-QList<TableItem> * BOQTableModel::getTableData()
+QList<BOQTableItem> * BOQTableModel::getTableData()
 {
     return pItemList;
 }

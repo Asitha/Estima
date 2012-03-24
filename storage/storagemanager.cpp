@@ -50,9 +50,9 @@ bool StorageManager::createConnection(QString userName, QString password, QStrin
     return pDBManager->createConnection(userName,password,hostname,Database);
 }
 
-void StorageManager::getItemsOf(QString category)
+QList<Item> StorageManager::getItemsOf(QString category)
 {
-    pDBManager->getItemsof(category);
+    return pDBManager->getItemsof(category);
 
 }
 
@@ -68,7 +68,7 @@ void StorageManager::saveURC(QString fileName, const URCData &data)
 
 URCData StorageManager::retrieveURC(QString fileName)
 {
-    return pXMLRenderer->retrieveFile(fileName);
+    return pXMLRenderer->retrieveURC(fileName);
 }
 
 Resource StorageManager::getResource(int ID)
@@ -84,4 +84,14 @@ QList<Resource> StorageManager::getResource(QString resourceName)
 bool StorageManager::addResource(Resource resource)
 {
     return pDBManager->addResource(resource);
+}
+
+bool StorageManager::saveProject(const QString &filepath, const BOQData &data)
+{
+    return pXMLRenderer->saveBOQ(filepath, data);
+}
+
+BOQData StorageManager::loadProject(const QString &filepath, bool *noError)
+{
+    return pXMLRenderer->retrieveBOQ(filepath, noError);
 }

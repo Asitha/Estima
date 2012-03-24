@@ -24,6 +24,7 @@
 #include <QPrinter>
 #include <QTextCharFormat>
 
+const QString FILE_FORMAT = ".xest";
 
 WorkSheetWidget::WorkSheetWidget(ProjData projData, StorageManager& storageManager, QWidget *parent) :
     QDialog(parent),
@@ -34,6 +35,7 @@ WorkSheetWidget::WorkSheetWidget(ProjData projData, StorageManager& storageManag
     this->boqData.projectData =  projData;
     this->pBOQGenerator = new BOQGenerator(storageManager,this);
     pBOQGenerator->setMarkup(projData.markup);
+    currentSavePath = "";
     setupBOQTable();
     setupCompleters();
     creatContextMenu();
@@ -82,22 +84,39 @@ void WorkSheetWidget::setStorageManager(StorageManager& storageManager)
 
 void WorkSheetWidget::addBOQItem(BOQItem &boqItem)
 {
-
-    QModelIndex index= pBOQTableModel->index(currentRow   ,   0, QModelIndex());
+    int editRow = getActiveRow();
+    QModelIndex index= pBOQTableModel->index(editRow   ,   0, QModelIndex());
     pBOQTableModel->setData(index, boqItem.itemStruct.refNum);
-    index= pBOQTableModel->index(currentRow   ,   1, QModelIndex());
+    index= pBOQTableModel->index(editRow   ,   1, QModelIndex());
     pBOQTableModel->setData(index, boqItem.itemStruct.description);
-    index= pBOQTableModel->index(currentRow    ,   2, QModelIndex());
+    index= pBOQTableModel->index(editRow    ,   2, QModelIndex());
     pBOQTableModel->setData(index, QString().setNum(boqItem.qty, 'f', 2));
-    index= pBOQTableModel->index(currentRow    ,   3, QModelIndex());
+    index= pBOQTableModel->index(editRow    ,   3, QModelIndex());
     pBOQTableModel->setData(index, boqItem.itemStruct.unit);
-    index= pBOQTableModel->index(currentRow    ,   4, QModelIndex());
+    index= pBOQTableModel->index(editRow    ,   4, QModelIndex());
     pBOQTableModel->setData(index, QString().setNum(boqItem.unitRate,'f', 2));
-    index= pBOQTableModel->index(currentRow    ,   5, QModelIndex());
+    index= pBOQTableModel->index(editRow    ,   5, QModelIndex());
     pBOQTableModel->setData(index, QString().setNum(boqItem.amount, 'f', 2));
-    ui->tableView->resizeRowToContents(currentRow);
-    currentRow++;
+    ui->tableView->resizeRowToContents(editRow);
 
+}
+
+void WorkSheetWidget::addBOQItem(BOQTableItem &boqTableItem )
+{
+    int editRow = getActiveRow();
+    QModelIndex index= pBOQTableModel->index(editRow   ,   0, QModelIndex());
+    pBOQTableModel->setData(index, boqTableItem.refNum);
+    index= pBOQTableModel->index(editRow   ,   1, QModelIndex());
+    pBOQTableModel->setData(index, boqTableItem.description);
+    index= pBOQTableModel->index(editRow    ,   2, QModelIndex());
+    pBOQTableModel->setData(index, boqTableItem.qty);
+    index= pBOQTableModel->index(editRow    ,   3, QModelIndex());
+    pBOQTableModel->setData(index, boqTableItem.unit);
+    index= pBOQTableModel->index(editRow    ,   4, QModelIndex());
+    pBOQTableModel->setData(index, boqTableItem.rate);
+    index= pBOQTableModel->index(editRow    ,   5, QModelIndex());
+    pBOQTableModel->setData(index, boqTableItem.amount);
+    ui->tableView->resizeRowToContents(editRow);
 
 
 }
@@ -133,17 +152,6 @@ void WorkSheetWidget::on_categoryEdit_lostFocus()
 
 void WorkSheetWidget::on_reset_Button_clicked()
 {
-//#ifndef QT_NO_PRINTER
-     QPrinter printer(QPrinter::ScreenResolution);
-     QPrintDialog dlg(&printer);
-//     PrintView view;
-//     view.setModel(ui->tableView->model());
-//     connect(&dlg, SIGNAL(paintRequested(QPrinter*)),
-//             &view, SLOT(print(QPrinter*)));
-//
-     dlg.exec();
-     createTextDocument()->print(&printer);
-//#endif
 
 
 }
@@ -197,10 +205,23 @@ void WorkSheetWidget::on_ItemEdit_textEdited(const QString &arg1)
     itemModel.setQuery(txt);
 }
 
+
+void WorkSheetWidget::on_categoryEdit_editingFinished()
+{
+    // TODO:
+    QList<Item> itemList = pStorageManager->getItemsOf(ui->categoryEdit->text());
+    if(!itemList.isEmpty()){
+
+    }else{
+//        QString txt = QString("SELECT ID, Description FROM item WHERE Description LIKE '\%%1\%' ").arg(arg1);
+//        itemModel.setQuery(txt);
+    }
+}
+
 void WorkSheetWidget::setupBOQTable()
 {
-    currentRow = 0;
-    pBOQTableModel = new BOQTableModel(25,  this);
+    activeRow = 0;
+    pBOQTableModel = new BOQTableModel(0,  this);
     ui->tableView->setModel(pBOQTableModel);
     ui->tableView->setColumnWidth(0, 80);
     ui->tableView->setColumnWidth(1, 300);
@@ -250,41 +271,129 @@ void WorkSheetWidget::creatContextMenu()
 QTextDocument* WorkSheetWidget::createTextDocument()
 {
     QTextDocument *document = new QTextDocument(this) ;
-    document->clear();
     QTextCursor cursor(document);
 
     cursor.insertText("BOQ Header");
 
-    QList<TableItem > *pItemList = ((BOQTableModel *)ui->tableView->model())->getTableData();
+    QList<BOQTableItem > *pItemList = ((BOQTableModel *)ui->tableView->model())->getTableData();
+
     // create Table
+
     int rowCount = ui->tableView->model()->rowCount();
     int columnCount = ui->tableView->model()->columnCount();
     QTextTableFormat tableFormat;
-    QVector<QTextLength> constraints;
-         constraints << QTextLength(QTextLength::PercentageLength, 10);
-         constraints << QTextLength(QTextLength::PercentageLength, 45);
-         constraints << QTextLength(QTextLength::PercentageLength, 10);
-         constraints << QTextLength(QTextLength::PercentageLength, 10);
-         constraints << QTextLength(QTextLength::PercentageLength, 10);
-         constraints << QTextLength(QTextLength::PercentageLength, 15);
-    tableFormat.setColumnWidthConstraints(constraints);
+    tableFormat.setColumnWidthConstraints(getColumnWidthConstraints());
+    tableFormat.setHeaderRowCount(3);
+    // to give room for the header ( rowCount +1 ) is used
+    QTextTable *pTextTable = cursor.insertTable(rowCount +1 , columnCount, tableFormat);
 
-    QTextTable *pTextTable = cursor.insertTable(rowCount, columnCount, tableFormat);
-    QTextTableCell *pCell;
+    // set headers
+    cursor = pTextTable->cellAt(0, 0).firstCursorPosition();
+    cursor.insertText("Ref Num");
+    cursor = pTextTable->cellAt(0, 1).firstCursorPosition();
+    cursor.insertText("Description");
+    cursor = pTextTable->cellAt(0, 2).firstCursorPosition();
+    cursor.insertText("Qty");
+    cursor = pTextTable->cellAt(0, 3).firstCursorPosition();
+    cursor.insertText("Unit");
+    cursor = pTextTable->cellAt(0, 4).firstCursorPosition();
+    cursor.insertText("Rate");
+    cursor = pTextTable->cellAt(0, 5).firstCursorPosition();
+    cursor.insertText("Amount");
+
+    // insert table data
     for(int i = 0; i < rowCount; i++){
-        cursor = pTextTable->cellAt(i, 0).firstCursorPosition();
+        // i = 0 row is used for the header, hence data is stored from row 1
+        cursor = pTextTable->cellAt(i+1, 0).firstCursorPosition();
         cursor.insertText(pItemList->at(i).refNum);
-        cursor = pTextTable->cellAt(i, 1).firstCursorPosition();
+        cursor = pTextTable->cellAt(i+1, 1).firstCursorPosition();
         cursor.insertText(pItemList->at(i).description);
-        cursor = pTextTable->cellAt(i, 2).firstCursorPosition();
+        cursor = pTextTable->cellAt(i+1, 2).firstCursorPosition();
         cursor.insertText(pItemList->at(i).qty);
-        cursor = pTextTable->cellAt(i, 3).firstCursorPosition();
+        cursor = pTextTable->cellAt(i+1, 3).firstCursorPosition();
         cursor.insertText(pItemList->at(i).unit);
-        cursor = pTextTable->cellAt(i, 4).firstCursorPosition();
+        cursor = pTextTable->cellAt(i+1, 4).firstCursorPosition();
         cursor.insertText(pItemList->at(i).rate);
-        cursor = pTextTable->cellAt(i, 5).firstCursorPosition();
+        cursor = pTextTable->cellAt(i+1, 5).firstCursorPosition();
         cursor.insertText(pItemList->at(i).amount);
     }
-
     return document;
 }
+
+void WorkSheetWidget::print()
+{
+    //#ifndef QT_NO_PRINTER
+    QPrinter printer(QPrinter::ScreenResolution);
+    QPrintDialog dlg(&printer);
+    dlg.exec();
+    QTextDocument *doc = createTextDocument();
+    doc->print(&printer);
+    delete doc;
+    //#endif
+
+}
+
+QVector<QTextLength> WorkSheetWidget::getColumnWidthConstraints()
+{
+    QVector<QTextLength> constraints;
+    int col = ui->tableView->model()->columnCount();
+    qreal columnWidth[col];
+    qreal total = 0;
+    for(int i = 0; i < col ; ++i){
+        columnWidth[i] = ui->tableView->columnWidth(i);
+        total += columnWidth[i];
+    }
+    for(int i =0; i < col; i++){
+        constraints << QTextLength(QTextLength::PercentageLength,(columnWidth[i]/total) * 100 );
+    }
+    return constraints;
+}
+
+void WorkSheetWidget::saveProject()
+{
+    if(currentSavePath.isEmpty()){
+        saveProjectAs();
+    }else{
+        boqData.itemList = *(pBOQTableModel->getTableData()) ;
+        pStorageManager->saveProject(currentSavePath, boqData);
+    }
+
+}
+
+void WorkSheetWidget::saveProjectAs()
+{
+    QString filePath = QFileDialog::getSaveFileName(this, tr("Save Project"), QDir::currentPath());
+
+    if(!filePath.isEmpty()){                    // empty string means user do not intend to save
+        currentSavePath = filePath;
+        if(!currentSavePath.endsWith(FILE_FORMAT)){     // if the extension is not given
+                currentSavePath.append(FILE_FORMAT);    // append the extension data
+        }
+        boqData.itemList = *(pBOQTableModel->getTableData()) ;
+        pStorageManager->saveProject(currentSavePath,boqData);
+    }
+}
+
+bool WorkSheetWidget::setBOQData(QList<BOQTableItem> tableDataList, QString filepath)
+{
+    activeRow = 0;
+    if(!filepath.isEmpty()){
+        currentSavePath =  filepath;
+    }
+    foreach(BOQTableItem tableItem, tableDataList){
+        addBOQItem(tableItem);
+    }
+}
+
+int WorkSheetWidget::getActiveRow()
+{
+    if(activeRow < pBOQTableModel->rowCount()){
+        ++activeRow;
+    }else {
+        pBOQTableModel->insertRow(activeRow);
+        activeRow = pBOQTableModel->rowCount();
+    }
+    return (activeRow -1);
+}
+
+

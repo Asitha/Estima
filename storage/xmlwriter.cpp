@@ -29,7 +29,7 @@ XMLWriter::XMLWriter()
 {
 }
 
-void XMLWriter::saveFile(QString fileName, const QDomDocument& domDoc  )
+bool XMLWriter::saveFile(QString fileName, const QDomDocument& domDoc  )
 {
 
 //    // writing to file
@@ -46,8 +46,10 @@ void XMLWriter::saveFile(QString fileName, const QDomDocument& domDoc  )
         stream << domDoc.toString();
         file.close();
         qDebug()<< QString("Written to file \"%1\" succesfully").arg(fileName);
+        return true;
     }else{
         qDebug("Couldn't write to file");
+        return false;
     }
 }
 

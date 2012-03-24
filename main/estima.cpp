@@ -72,7 +72,18 @@ void Estima::on_actionNew_Project_triggered()
 
 void Estima::on_actionOpen_Project_triggered()
 {
-    QString filePath = QFileDialog::getOpenFileName(this, "Open Project", QDir::currentPath());
+    QString filepath = QFileDialog::getOpenFileName(this, "Open Project", QDir::currentPath(),
+                                                    "Estima projects (*.xest);; All file (*.*)");
+    if(!filepath.isEmpty()){
+        bool noError = true;
+        BOQData boqData = pStorageManager->loadProject(filepath, &noError);
+        if(noError){
+            loadProject(boqData, filepath);
+        }else{
+            QMessageBox::critical(this, tr("Error Loading project"), tr("<p>Estima encounterred an error while loading "
+                                               "the project file. The file may be corrupted<p>"));
+        }
+    }
 }
 
 void Estima::addNewSheet(WorkSheetWidget& newWorksheet)
@@ -160,4 +171,29 @@ void Estima::on_actionResources_triggered()
     ResourceDataBrowser *browser = new ResourceDataBrowser(*pStorageManager, this);
     browser->exec();
 
+}
+
+
+
+void Estima::on_actionPrint_triggered()
+{
+    if(ui->tabWidget->currentIndex() != -1){
+        WorkSheetWidget *pWrkSheetWidget = (WorkSheetWidget *)ui->tabWidget->currentWidget();
+        pWrkSheetWidget->print();
+    }
+}
+
+void Estima::on_actionSave_triggered()
+{
+    if(ui->tabWidget->currentIndex() != -1){
+        WorkSheetWidget *pWrkSheetWidget = (WorkSheetWidget *)ui->tabWidget->currentWidget();
+        pWrkSheetWidget->saveProject();
+    }
+}
+
+void Estima::loadProject(BOQData boqData, const QString &filepath )
+{
+    pCurrentSheet = new WorkSheetWidget(boqData.projectData, *pStorageManager, this);
+    pCurrentSheet->setBOQData(boqData.itemList, filepath);
+    addNewSheet(*pCurrentSheet);
 }

@@ -18,16 +18,10 @@
 #ifndef BOQTABLEMODEL_H
 #define BOQTABLEMODEL_H
 
+#include "core/CoreStructures.h"
+
 #include <QAbstractTableModel>
 
-struct TableItem{
-    QString refNum;
-    QString description;
-    QString qty;
-    QString unit;
-    QString rate;
-    QString amount;
-};
 
 
 class BOQTableModel : public QAbstractTableModel
@@ -36,8 +30,8 @@ class BOQTableModel : public QAbstractTableModel
 public:
     explicit BOQTableModel(QObject *parent = 0);
     explicit BOQTableModel(int rowCount, QObject *parent);
-    int rowCount(const QModelIndex &parent) const;
-    int columnCount(const QModelIndex &parent) const;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const;
+    int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role) const;
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
     Qt::ItemFlags flags(const QModelIndex &index) const;
@@ -47,12 +41,12 @@ public:
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
     QVariant headerData(int section, Qt::Orientation orientation, int role) const;
 
-    QList<TableItem>* getTableData();
+    QList<BOQTableItem>* getTableData();
     QString toCSV();
 private:
     int rows;
     int columns;
-    QList<TableItem> *pItemList;
+    QList<BOQTableItem> *pItemList;
 
     void addToItemList(const QModelIndex &index, const QVariant &value);
 signals:

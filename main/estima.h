@@ -61,9 +61,14 @@ private slots:
 
     void on_actionResources_triggered();
 
+    void on_actionPrint_triggered();
+
+    void on_actionSave_triggered();
+
 private:
     // members
     void init();
+    inline void loadProject(BOQData boqData, const QString &filepath);
 
     // variables
     Ui::MainWindow *ui;

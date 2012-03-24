@@ -23,6 +23,7 @@
 #include "core/unitratecalculator.h"
 #include "storage/storagemanager.h"
 #include "storage/item.h"
+#include "core/CoreStructures.h"
 
 /**
   * Struct to store data related to the item displayed in the BOQ.

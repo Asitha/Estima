@@ -15,21 +15,23 @@
    along with Estima.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef XMLWRITER_H
-#define XMLWRITER_H
+#ifndef TABLEDATACONVERTOR_H
+#define TABLEDATACONVERTOR_H
 
-#include <QString>
-#include <QtXml>
-#include "item.h"
+#include <QObject>
+#include <QTableView>
+#include <QTextDocument>
 
-
-
-class XMLWriter
+class TableDataConvertor : public QObject
 {
+    Q_OBJECT
 public:
-    XMLWriter();
-    bool saveFile(QString fileName, const QDomDocument& domDoc);
-    QDomDocument retrieveFile(QString fileName);
+    explicit TableDataConvertor(QObject *parent = 0);
+    QTextDocument *toTextDocument(QTableView *tableView);
+signals:
+
+public slots:
+
 };
 
-#endif // XMLWRITER_H
+#endif // TABLEDATACONVERTOR_H

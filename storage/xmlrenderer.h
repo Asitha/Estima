@@ -23,6 +23,7 @@
 
 #include "storage/item.h"
 #include "storage/xmlwriter.h"
+#include "core/CoreStructures.h"
 
 
 class XMLRenderer: public QObject
@@ -32,10 +33,13 @@ class XMLRenderer: public QObject
 public:
     XMLRenderer(QObject *parent = 0);
     void saveURC(QString fileName, const URCData& data);
-    URCData retrieveFile(QString fileName);
+    URCData retrieveURC(QString fileName);
+    bool saveBOQ(const QString &filepath, const BOQData& data);
+    BOQData retrieveBOQ(const QString &filepath, bool *noError = new bool(true));
 
 private:
     XMLWriter xmlwriter;
+
 };
 
 #endif // XMLRENDERER_H
