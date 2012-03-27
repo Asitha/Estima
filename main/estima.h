@@ -50,7 +50,7 @@ private slots:
 
     void on_actionOpen_Project_triggered();
 
-
+    void updateTabRelatedActions();
 
 
     void closeTab(int i);
@@ -65,10 +65,18 @@ private slots:
 
     void on_actionSave_triggered();
 
+    void closeEvent(QCloseEvent *event);
+
+    void on_actionSave_as_triggered();
+
+    void on_actionView_triggered();
+
 private:
     // members
     void init();
     inline void loadProject(BOQData boqData, const QString &filepath);
+    void writeSettings();
+    void readSettings();
 
     // variables
     Ui::MainWindow *ui;

@@ -32,7 +32,8 @@ HEADERS += addons/printview.h \
     core/boqdelegate.h \
     gui/resourcedatabrowser.h \
     core/boqtablemodel.h \
-    addons/tabledataconvertor.h
+    addons/tabledataconvertor.h \
+    gui/boqviewerdialog.h
 
 FORMS += core/worksheetwidget.ui \
          gui/aboutdialog.ui \
@@ -40,7 +41,8 @@ FORMS += core/worksheetwidget.ui \
          gui/addresource.ui \
          gui/projectpropertiesform.ui \
          main/mainwindow.ui \
-    gui/resourcedatabrowser.ui
+    gui/resourcedatabrowser.ui \
+    gui/boqviewerdialog.ui
 
 SOURCES += addons/printview.cpp \
            core/boqgenerator.cpp \
@@ -62,4 +64,5 @@ SOURCES += addons/printview.cpp \
     core/boqdelegate.cpp \
     gui/resourcedatabrowser.cpp \
     core/boqtablemodel.cpp \
-    addons/tabledataconvertor.cpp
+    addons/tabledataconvertor.cpp \
+    gui/boqviewerdialog.cpp

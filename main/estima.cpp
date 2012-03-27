@@ -23,8 +23,11 @@
 #include "gui/addresource.h"
 #include "units.h"
 #include "gui/resourcedatabrowser.h"
+#include "gui/boqviewerdialog.h"
 
 #include <QFileDialog>
+#include <QSettings>
+
 
 
 
@@ -44,7 +47,8 @@ Estima::Estima(QWidget *parent) :
     ui->tabWidget->setTabsClosable(true);
     connect(ui->tabWidget, SIGNAL(tabCloseRequested(int)),this, SLOT(closeTab(int)) );
     init();
-
+    updateTabRelatedActions();
+    readSettings();
 }
 
 
@@ -88,14 +92,14 @@ void Estima::on_actionOpen_Project_triggered()
 
 void Estima::addNewSheet(WorkSheetWidget& newWorksheet)
 {
-
     newWorksheet.setTabIndex(sheetCount);
     QString sheetName = QString(tr("Sheet %1")).arg(sheetCount+1);
     ui->tabWidget->insertTab(sheetCount, &newWorksheet, sheetName);
     ui->tabWidget->setCurrentIndex(sheetCount);
     sheetCount++;
-
+    updateTabRelatedActions();
 }
+
 
 void Estima::removeSheet(WorkSheetWidget* worksheet)
 {
@@ -106,6 +110,7 @@ void Estima::removeSheet(WorkSheetWidget* worksheet)
 
 void Estima::init()
 {
+    connect(ui->actionExit, SIGNAL(triggered()), this, SLOT(close()));
     // default xmlrenderer
     pXMLRenderer = new XMLRenderer(this);
 
@@ -124,19 +129,27 @@ void Estima::init()
     }else{
         Units::getInstance()->setStorageManager(*pStorageManager);
     }
+
 }
 
 
-void Estima::closeTab(int i)
+void Estima::closeTab(int tabNumber)
 {
-    int kstdButton = QMessageBox::question(ui->tabWidget, tr("Close Request"), tr("Are you sure you want to close the worksheet"), QMessageBox::Yes, QMessageBox::No);
-
-    if(kstdButton == QMessageBox::Yes){
-        ui->tabWidget->removeTab(i);
+    int userReply = QMessageBox::question(ui->tabWidget, tr("Close Request"), tr("Do you want save "
+           "the project before closing?"), QMessageBox::Yes, QMessageBox::No, QMessageBox::Cancel);
+    bool isSucess = false;
+    switch(userReply){
+    case QMessageBox::Yes:
+        isSucess = ((WorkSheetWidget *)ui->tabWidget->widget(tabNumber))->saveProject();
+        if(!isSucess){
+            break;
+        }
+    case QMessageBox::No:
+        ui->tabWidget->removeTab(tabNumber);
         sheetCount--;
-    }else{
-
+        updateTabRelatedActions();
     }
+
 }
 
 void Estima::createNewPoject(ProjData projData)
@@ -168,7 +181,7 @@ void Estima::on_actionAbout_Estima_triggered()
 
 void Estima::on_actionResources_triggered()
 {
-    ResourceDataBrowser *browser = new ResourceDataBrowser(*pStorageManager, this);
+    ResourceDataBrowser *browser = new ResourceDataBrowser(pStorageManager, this);
     browser->exec();
 
 }
@@ -196,4 +209,64 @@ void Estima::loadProject(BOQData boqData, const QString &filepath )
     pCurrentSheet = new WorkSheetWidget(boqData.projectData, *pStorageManager, this);
     pCurrentSheet->setBOQData(boqData.itemList, filepath);
     addNewSheet(*pCurrentSheet);
+}
+
+void Estima::closeEvent(QCloseEvent *event){
+    int userReply = QMessageBox::question(this, tr("Close Resquest"), tr("Are you sure you want"
+                         " to close <i><b>Estima</b></i> ?"),QMessageBox::Yes,  QMessageBox::No );
+    if( userReply == QMessageBox::No){
+        event->ignore();
+    }else {
+        writeSettings();
+    }
+
+}
+
+void Estima::updateTabRelatedActions()
+{
+    bool isEnable = true;
+    if(ui->tabWidget->count() == 0){
+        isEnable = false;
+    }
+    ui->actionSave->setEnabled(isEnable);
+    ui->actionSave_as->setEnabled(isEnable);
+    ui->actionPrint->setEnabled(isEnable);
+    ui->actionView->setEnabled(isEnable);
+}
+
+void Estima::on_actionSave_as_triggered()
+{
+    if(ui->tabWidget->currentIndex() != -1){
+        WorkSheetWidget *pWrkSheetWidget = (WorkSheetWidget *)ui->tabWidget->currentWidget();
+        pWrkSheetWidget->saveProjectAs();
+    }
+}
+
+void Estima::writeSettings()
+{
+    QSettings settings("Estima Inc.", "Estima" );
+    settings.beginGroup("MainWindow");
+         settings.setValue("size", size());
+         settings.setValue("pos", pos());
+         settings.endGroup();
+}
+
+void Estima::readSettings()
+{
+    QSettings settings("Estima Inc.", "Estima" );
+    settings.beginGroup("MainWindow");
+    resize(settings.value("size", QSize(800, 700)).toSize());
+    move(settings.value("pos", QPoint(200, 200)).toPoint());
+    settings.endGroup();
+
+}
+
+void Estima::on_actionView_triggered()
+{
+    if(ui->tabWidget->currentIndex() != -1){
+        WorkSheetWidget *pWrkSheetWidget = (WorkSheetWidget *)ui->tabWidget->currentWidget();
+
+        BOQViewerDialog viewer(pWrkSheetWidget->createTextDocument(), this);
+        viewer.exec();
+    }
 }

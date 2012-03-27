@@ -36,10 +36,13 @@ WorkSheetWidget::WorkSheetWidget(ProjData projData, StorageManager& storageManag
     this->pBOQGenerator = new BOQGenerator(storageManager,this);
     pBOQGenerator->setMarkup(projData.markup);
     currentSavePath = "";
+    ui->quantitySpinBox->setRange(0.00, 9999999999);
     setupBOQTable();
     setupCompleters();
     creatContextMenu();
+
 }
+
 
 WorkSheetWidget::~WorkSheetWidget()
 {
@@ -84,7 +87,7 @@ void WorkSheetWidget::setStorageManager(StorageManager& storageManager)
 
 void WorkSheetWidget::addBOQItem(BOQItem &boqItem)
 {
-    int editRow = getActiveRow();
+    int editRow = getActiveRow("");
     QModelIndex index= pBOQTableModel->index(editRow   ,   0, QModelIndex());
     pBOQTableModel->setData(index, boqItem.itemStruct.refNum);
     index= pBOQTableModel->index(editRow   ,   1, QModelIndex());
@@ -103,7 +106,7 @@ void WorkSheetWidget::addBOQItem(BOQItem &boqItem)
 
 void WorkSheetWidget::addBOQItem(BOQTableItem &boqTableItem )
 {
-    int editRow = getActiveRow();
+    int editRow = getActiveRow("");
     QModelIndex index= pBOQTableModel->index(editRow   ,   0, QModelIndex());
     pBOQTableModel->setData(index, boqTableItem.refNum);
     index= pBOQTableModel->index(editRow   ,   1, QModelIndex());
@@ -272,7 +275,9 @@ QTextDocument* WorkSheetWidget::createTextDocument()
 {
     QTextDocument *document = new QTextDocument(this) ;
     QTextCursor cursor(document);
-
+    QTextCharFormat charFormat;
+    charFormat.setFont(QFont("Arial",11));
+    cursor.setCharFormat(charFormat);
     cursor.insertText("BOQ Header");
 
     QList<BOQTableItem > *pItemList = ((BOQTableModel *)ui->tableView->model())->getTableData();
@@ -287,35 +292,45 @@ QTextDocument* WorkSheetWidget::createTextDocument()
     // to give room for the header ( rowCount +1 ) is used
     QTextTable *pTextTable = cursor.insertTable(rowCount +1 , columnCount, tableFormat);
 
+    QTextBlockFormat rightAlign, center;
+    rightAlign.setAlignment(Qt::AlignRight);
+
+    center.setAlignment(Qt::AlignCenter);
+
     // set headers
-    cursor = pTextTable->cellAt(0, 0).firstCursorPosition();
-    cursor.insertText("Ref Num");
-    cursor = pTextTable->cellAt(0, 1).firstCursorPosition();
-    cursor.insertText("Description");
-    cursor = pTextTable->cellAt(0, 2).firstCursorPosition();
-    cursor.insertText("Qty");
-    cursor = pTextTable->cellAt(0, 3).firstCursorPosition();
-    cursor.insertText("Unit");
-    cursor = pTextTable->cellAt(0, 4).firstCursorPosition();
-    cursor.insertText("Rate");
-    cursor = pTextTable->cellAt(0, 5).firstCursorPosition();
-    cursor.insertText("Amount");
+    pTextTable->cellAt(0, 0).firstCursorPosition().setBlockFormat(center);
+    pTextTable->cellAt(0, 0).firstCursorPosition().insertText("Ref Num");
+
+    pTextTable->cellAt(0, 1).firstCursorPosition().setBlockFormat(center);
+    pTextTable->cellAt(0, 1).firstCursorPosition().insertText("Description");
+
+    pTextTable->cellAt(0, 2).firstCursorPosition().setBlockFormat(center);
+    pTextTable->cellAt(0, 2).firstCursorPosition().insertText("Qty");
+
+    pTextTable->cellAt(0, 3).firstCursorPosition().setBlockFormat(center);
+    pTextTable->cellAt(0, 3).firstCursorPosition().insertText("Unit");;
+
+    pTextTable->cellAt(0, 4).firstCursorPosition().setBlockFormat(center);
+    pTextTable->cellAt(0, 4).firstCursorPosition().insertText("Rate");
+
+    pTextTable->cellAt(0, 5).firstCursorPosition().setBlockFormat(center);
+    pTextTable->cellAt(0, 5).firstCursorPosition().insertText("Amount");
+
 
     // insert table data
     for(int i = 0; i < rowCount; i++){
         // i = 0 row is used for the header, hence data is stored from row 1
-        cursor = pTextTable->cellAt(i+1, 0).firstCursorPosition();
-        cursor.insertText(pItemList->at(i).refNum);
-        cursor = pTextTable->cellAt(i+1, 1).firstCursorPosition();
-        cursor.insertText(pItemList->at(i).description);
-        cursor = pTextTable->cellAt(i+1, 2).firstCursorPosition();
-        cursor.insertText(pItemList->at(i).qty);
-        cursor = pTextTable->cellAt(i+1, 3).firstCursorPosition();
-        cursor.insertText(pItemList->at(i).unit);
-        cursor = pTextTable->cellAt(i+1, 4).firstCursorPosition();
-        cursor.insertText(pItemList->at(i).rate);
-        cursor = pTextTable->cellAt(i+1, 5).firstCursorPosition();
-        cursor.insertText(pItemList->at(i).amount);
+        pTextTable->cellAt(i+1, 0).firstCursorPosition().insertText(pItemList->at(i).refNum);
+        pTextTable->cellAt(i+1, 1).firstCursorPosition().insertText(pItemList->at(i).description);
+        pTextTable->cellAt(i+1, 2).firstCursorPosition().setBlockFormat(rightAlign);
+        pTextTable->cellAt(i+1, 2).firstCursorPosition().insertText(pItemList->at(i).qty);
+        pTextTable->cellAt(i+1, 3).firstCursorPosition().setBlockFormat(rightAlign);
+        pTextTable->cellAt(i+1, 3).firstCursorPosition().insertText(pItemList->at(i).unit);
+        pTextTable->cellAt(i+1, 4).firstCursorPosition().setBlockFormat(rightAlign);
+        pTextTable->cellAt(i+1, 4).firstCursorPosition().insertText(pItemList->at(i).rate);
+        pTextTable->cellAt(i+1, 5).firstCursorPosition().setBlockFormat(rightAlign);
+        pTextTable->cellAt(i+1, 5).firstCursorPosition().insertText(pItemList->at(i).amount);
+
     }
     return document;
 }
@@ -349,18 +364,17 @@ QVector<QTextLength> WorkSheetWidget::getColumnWidthConstraints()
     return constraints;
 }
 
-void WorkSheetWidget::saveProject()
+bool WorkSheetWidget::saveProject()
 {
     if(currentSavePath.isEmpty()){
-        saveProjectAs();
+        return saveProjectAs();
     }else{
         boqData.itemList = *(pBOQTableModel->getTableData()) ;
-        pStorageManager->saveProject(currentSavePath, boqData);
+        return pStorageManager->saveProject(currentSavePath, boqData);
     }
-
 }
 
-void WorkSheetWidget::saveProjectAs()
+bool WorkSheetWidget::saveProjectAs()
 {
     QString filePath = QFileDialog::getSaveFileName(this, tr("Save Project"), QDir::currentPath());
 
@@ -370,8 +384,9 @@ void WorkSheetWidget::saveProjectAs()
                 currentSavePath.append(FILE_FORMAT);    // append the extension data
         }
         boqData.itemList = *(pBOQTableModel->getTableData()) ;
-        pStorageManager->saveProject(currentSavePath,boqData);
+        return pStorageManager->saveProject(currentSavePath,boqData);
     }
+    return false;
 }
 
 bool WorkSheetWidget::setBOQData(QList<BOQTableItem> tableDataList, QString filepath)
@@ -383,10 +398,13 @@ bool WorkSheetWidget::setBOQData(QList<BOQTableItem> tableDataList, QString file
     foreach(BOQTableItem tableItem, tableDataList){
         addBOQItem(tableItem);
     }
+    return true;
 }
 
-int WorkSheetWidget::getActiveRow()
+int WorkSheetWidget::getActiveRow(QString refNum)
 {
+
+
     if(activeRow < pBOQTableModel->rowCount()){
         ++activeRow;
     }else {
@@ -395,5 +413,23 @@ int WorkSheetWidget::getActiveRow()
     }
     return (activeRow -1);
 }
+
+void WorkSheetWidget::tableClicked(QModelIndex index)
+{
+    qDebug( ) << "Clicked @ " << index;
+}
+
+void WorkSheetWidget::addRowAboveSelected()
+{
+}
+
+void WorkSheetWidget::addRowBelowSelected()
+{
+}
+
+void WorkSheetWidget::removeSelectedRow()
+{
+}
+
 
 

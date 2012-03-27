@@ -48,7 +48,7 @@ public:
 signals:
 
 public slots:
-private:
+private:    
     float calculateUnitRate(URCData dataSet);
     StorageManager *pStorageManager;
     CalcData calcData;

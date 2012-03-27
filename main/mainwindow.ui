@@ -59,10 +59,11 @@
     <addaction name="separator"/>
     <addaction name="actionPrint"/>
     <addaction name="actionExit"/>
+    <addaction name="actionView"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
-     <string>Help</string>
+     <string>About</string>
     </property>
     <addaction name="actionAbout_Estima"/>
     <addaction name="actionAbout_Qt"/>
@@ -155,6 +156,11 @@
   <action name="actionPrint">
    <property name="text">
     <string>Print</string>
+   </property>
+  </action>
+  <action name="actionView">
+   <property name="text">
+    <string>View</string>
    </property>
   </action>
  </widget>

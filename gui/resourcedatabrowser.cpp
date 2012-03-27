@@ -21,12 +21,12 @@
 
 #include <QDebug>
 
-ResourceDataBrowser::ResourceDataBrowser(StorageManager &storageManager, QWidget *parent) :
+ResourceDataBrowser::ResourceDataBrowser(StorageManager *pStorageManager, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::ResourceDataBrowser)
 {
     ui->setupUi(this);
-    this->pStorageManagerAct = &storageManager;
+    this->pStorageManagerAct = pStorageManager;
     setWindowTitle(tr("Resource Data Browser"));
 
     initActions();

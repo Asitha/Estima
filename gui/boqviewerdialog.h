@@ -15,49 +15,36 @@
    along with Estima.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef RESOURCEDATABROWSER_H
-#define RESOURCEDATABROWSER_H
+#ifndef BOQVIEWERDIALOG_H
+#define BOQVIEWERDIALOG_H
 
-#include "storage/storagemanager.h"
+#include "boqtablemodel.h"
 
+#include <QTextDocument>
 #include <QDialog>
 
 namespace Ui {
-    class ResourceDataBrowser;
+    class BOQViewerDialog;
 }
 
-class ResourceDataBrowser : public QDialog
+class BOQViewerDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit ResourceDataBrowser(StorageManager *pStorageManagerAct ,QWidget *parent = 0);
-    ~ResourceDataBrowser();
+    explicit BOQViewerDialog(QTextDocument *document, QWidget *parent = 0);
+    ~BOQViewerDialog();
+    void setText(QTextDocument *document);
 
 private slots:
-    void on_closeButton_clicked();
+    void on_cancelButton_clicked();
 
-    void on_AddResourceButton_clicked();
-
-    void removeSelectedResource();
-
-    void addNewResource();
-
-    void editSelectedResource();
-
+    void on_saveAsPDFButton_clicked();
 
 private:
-    QAction *pRemoveResourceAct;
-    QAction *pAddResourceAct;
-    QAction *pEditResourceAct;
+    QTextDocument *pDocument;
+    Ui::BOQViewerDialog *ui;
 
-    StorageManager *pStorageManagerAct;
-    Ui::ResourceDataBrowser *ui;
-
-    QSqlTableModel *pModel;
-    void setupResourceTable();
-    void fillUIData();
-    void initActions();
 };
 
-#endif // RESOURCEDATABROWSER_H
+#endif // BOQVIEWERDIALOG_H
