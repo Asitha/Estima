@@ -43,6 +43,7 @@ public:
 
     QList<BOQTableItem>* getTableData();
     QString toCSV();
+    int rowOfItem(QString refNum);
 private:
     int rows;
     int columns;
@@ -50,7 +51,7 @@ private:
 
     void addToItemList(const QModelIndex &index, const QVariant &value);
 signals:
-    void editCompleted(const QString &);
+
 
 public slots:
 

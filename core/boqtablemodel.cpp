@@ -97,8 +97,7 @@ bool BOQTableModel::setData(const QModelIndex &index, const QVariant &value, int
     if(role  == Qt::EditRole && index.row() < rows){
         if(index.row() < pItemList->size() ) {
             addToItemList(index, value);
-
-            emit editCompleted(value.toString());
+            emit dataChanged(index, index);
             return true;
         }else {
             return false;
@@ -225,6 +224,21 @@ QString BOQTableModel::toCSV()
 QList<BOQTableItem> * BOQTableModel::getTableData()
 {
     return pItemList;
+}
+
+/**
+  * returns the row of the item found if an item can't be found returns -1
+  */
+int BOQTableModel::rowOfItem(QString refNum)
+{
+    int row = -1;
+    for(int i =0; i < pItemList->count(); ++i){
+        if(pItemList->at(i).refNum.compare(refNum) ==  0){
+            row = i;
+            break;
+        }
+    }
+    return row;
 }
 
 

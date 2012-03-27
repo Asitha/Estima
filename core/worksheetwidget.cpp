@@ -87,7 +87,7 @@ void WorkSheetWidget::setStorageManager(StorageManager& storageManager)
 
 void WorkSheetWidget::addBOQItem(BOQItem &boqItem)
 {
-    int editRow = getActiveRow("");
+    int editRow = getActiveRow(boqItem.itemStruct.refNum);
     QModelIndex index= pBOQTableModel->index(editRow   ,   0, QModelIndex());
     pBOQTableModel->setData(index, boqItem.itemStruct.refNum);
     index= pBOQTableModel->index(editRow   ,   1, QModelIndex());
@@ -106,7 +106,7 @@ void WorkSheetWidget::addBOQItem(BOQItem &boqItem)
 
 void WorkSheetWidget::addBOQItem(BOQTableItem &boqTableItem )
 {
-    int editRow = getActiveRow("");
+    int editRow = getActiveRow(boqTableItem.refNum);
     QModelIndex index= pBOQTableModel->index(editRow   ,   0, QModelIndex());
     pBOQTableModel->setData(index, boqTableItem.refNum);
     index= pBOQTableModel->index(editRow   ,   1, QModelIndex());
@@ -403,7 +403,10 @@ bool WorkSheetWidget::setBOQData(QList<BOQTableItem> tableDataList, QString file
 
 int WorkSheetWidget::getActiveRow(QString refNum)
 {
-
+    int row = -1;
+    if((row = pBOQTableModel->rowOfItem(refNum)) != -1){
+        return row;
+    }
 
     if(activeRow < pBOQTableModel->rowCount()){
         ++activeRow;
@@ -430,6 +433,8 @@ void WorkSheetWidget::addRowBelowSelected()
 void WorkSheetWidget::removeSelectedRow()
 {
 }
+
+
 
 
 

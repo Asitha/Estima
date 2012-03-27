@@ -53,6 +53,7 @@ public:
     bool setBOQData(QList<BOQTableItem> tableDataList, QString filepath = QString(""));
     QTextDocument* createTextDocument();
 
+
 private slots:
 
     void on_addItemButton_clicked();

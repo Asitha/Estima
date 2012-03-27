@@ -57,9 +57,9 @@
     <addaction name="actionSave"/>
     <addaction name="actionSave_as"/>
     <addaction name="separator"/>
+    <addaction name="actionView"/>
     <addaction name="actionPrint"/>
     <addaction name="actionExit"/>
-    <addaction name="actionView"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -160,7 +160,7 @@
   </action>
   <action name="actionView">
    <property name="text">
-    <string>View</string>
+    <string>Print Preview</string>
    </property>
   </action>
  </widget>
