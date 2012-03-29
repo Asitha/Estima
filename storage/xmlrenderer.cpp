@@ -93,6 +93,7 @@ URCData XMLRenderer::retrieveURC(QString fileName)
 {
 
     QDomDocument URCFile = xmlwriter.retrieveFile(fileName);
+
     URCData tmpData;
 
     tmpData.itemID = -1;  /* if error occur in retrieving file or has no attribute

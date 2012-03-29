@@ -44,7 +44,7 @@
      <x>0</x>
      <y>0</y>
      <width>1050</width>
-     <height>26</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -74,6 +74,7 @@
     </property>
     <addaction name="actionResources"/>
     <addaction name="actionItems"/>
+    <addaction name="actionURC_Editor"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuOptions"/>
@@ -145,12 +146,12 @@
   </action>
   <action name="actionResources">
    <property name="text">
-    <string>Resources</string>
+    <string>Browse Resources</string>
    </property>
   </action>
   <action name="actionItems">
    <property name="text">
-    <string>Items</string>
+    <string>Browse Items</string>
    </property>
   </action>
   <action name="actionPrint">
@@ -161,6 +162,11 @@
   <action name="actionView">
    <property name="text">
     <string>Print Preview</string>
+   </property>
+  </action>
+  <action name="actionURC_Editor">
+   <property name="text">
+    <string>URC Editor</string>
    </property>
   </action>
  </widget>

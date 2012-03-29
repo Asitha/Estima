@@ -90,10 +90,8 @@ void ResourceDataBrowser::removeSelectedResource()
 {
     // Even when an item is not selected this will be activated;
     QModelIndex idx = ui->tableView->selectionModel()->currentIndex();
-
-    ui->tableView->model()->removeRow(idx.row(), idx);
-
-
+    qDebug()<< idx;
+    pModel->removeRow(idx.row());
 }
 
 void ResourceDataBrowser::addNewResource()

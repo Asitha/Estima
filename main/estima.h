@@ -71,6 +71,10 @@ private slots:
 
     void on_actionView_triggered();
 
+    void on_actionItems_triggered();
+
+    void on_actionURC_Editor_triggered();
+
 private:
     // members
     void init();

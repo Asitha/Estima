@@ -21,9 +21,11 @@
 #include "core/worksheetwidget.h"
 #include "main/estima.h"
 #include "gui/addresource.h"
-#include "units.h"
+#include "core/units.h"
 #include "gui/resourcedatabrowser.h"
 #include "gui/boqviewerdialog.h"
+#include "gui/itemviewer.h"
+#include "gui/addremoveurc.h"
 
 #include <QFileDialog>
 #include <QSettings>
@@ -114,12 +116,12 @@ void Estima::init()
     // default xmlrenderer
     pXMLRenderer = new XMLRenderer(this);
 
-    /*
-    // setup storageManager for sqlite
-    storageManager = new StorageManager(sqliteDBM, *xmlRenderer, this);
-    // sqlite arguments not needed. for completness only.
-    storageManager->createConnection("root","","127.0.0.1","estima");*/
 
+//    // setup storageManager for sqlite
+//    pStorageManager = new StorageManager(sqliteDBM, *pXMLRenderer, this);
+//    // sqlite arguments not needed. for completness only.
+//    pStorageManager->createConnection("root","","127.0.0.1","estima");
+//    Units::getInstance()->setStorageManager(*pStorageManager);
     // setup storageManager for mysql
     pStorageManager = new StorageManager(mySQLDBM, *pXMLRenderer, this);
     if(!pStorageManager->createConnection("root","","127.0.0.1","estima")){
@@ -269,4 +271,17 @@ void Estima::on_actionView_triggered()
         BOQViewerDialog viewer(pWrkSheetWidget->createTextDocument(), this);
         viewer.exec();
     }
+}
+
+void Estima::on_actionItems_triggered()
+{
+    ItemViewer itemViewer;
+    itemViewer.exec();
+}
+
+void Estima::on_actionURC_Editor_triggered()
+{
+    BOQGenerator boqGenerator(*pStorageManager);
+    AddRemoveURC urcEditor(pStorageManager, &boqGenerator, this);
+    urcEditor.exec();
 }

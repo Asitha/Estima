@@ -38,13 +38,14 @@ private:
     QSqlDatabase db;
 
     QList<Item> processItems(QSqlQuery& query);
-    QSqlQuery runPrepQuery(QString query, QString bindvalue ,bool isForwardOnly );
-    bool runQuery(QString stmt, QSqlQuery *query, bool isForwardOnly =  true ) ;
+    QSqlQuery runPrepQuery(QString query, QStringList bindvalue ,bool isForwardOnly = true, bool *isSuccess = false);
+    bool runQuery(QString stmt, QSqlQuery *query, bool isForwardOnly =  true );
+    Resource fillResourceData(QSqlQuery query);
 
 
 public:
     explicit SQLiteDBManager(QObject *parent = 0);
-
+    ~SQLiteDBManager();
 
     // overiden methods
     bool createConnection(QString username, QString passsword, QString hostname, QString database);
@@ -55,8 +56,7 @@ public:
     Resource getResource(int ID);
     QList<Resource> getResource(QString resourceName);
     bool addResource(Resource resource);
-
-    ~SQLiteDBManager();
+    void updateItemQueryModel(QSqlQueryModel &model, QString description);
 
 };
 

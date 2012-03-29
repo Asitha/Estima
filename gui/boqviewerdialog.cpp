@@ -29,7 +29,7 @@ BOQViewerDialog::BOQViewerDialog(QTextDocument *pDocument, QWidget *parent) :
     ui->setupUi(this);
     this->pDocument = pDocument;
     setText(pDocument);
-
+    setWindowTitle(tr("BOQ"));
 }
 
 BOQViewerDialog::~BOQViewerDialog()

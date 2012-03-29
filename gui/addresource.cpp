@@ -17,7 +17,7 @@
 
 #include "addresource.h"
 #include "ui_addresource.h"
-#include "units.h"
+#include "core/units.h"
 
 
 #include <QMessageBox>
@@ -30,7 +30,6 @@ AddResource::AddResource(StorageManager &storageManager, QWidget *parent) :
     this->pStorageManager = &storageManager;
     setWindowTitle(tr("Resource Properties"));
     fillUIData();
-
 }
 
 AddResource::~AddResource()
@@ -72,7 +71,7 @@ void AddResource::on_cancelButton_clicked()
 bool AddResource::validateData(QString *ErrorMessage)
 {
     bool isValid = true;
-    *ErrorMessage = ("<h5>Please re-enter data avoiding following errors </h5> <ul>");
+    *ErrorMessage = ("<h5>Re-enter data avoiding following errors </h5> <ul>");
     if(ui->nameLineEdit->text() == ""){
         isValid = false;
         ErrorMessage->append(" <li>Name can't be empty</li>");
@@ -94,9 +93,6 @@ void AddResource::fillUIData()
 {
     QStringList types;
     types << "Material" << "Labour";
-
-
     ui->typeComboBox->addItems(types);
-
     ui->unitRsrcComboBox->addItems(Units::getInstance()->getUnits());
 }

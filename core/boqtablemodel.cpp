@@ -23,6 +23,8 @@ BOQTableModel::BOQTableModel(QObject *parent) :
     QAbstractTableModel(parent)
 {
     pItemList = new QList<BOQTableItem>();
+//    pItmList = new QHash();
+//    pCategoryList =
     this->rows = 0;
     this->columns = 6;
 }
@@ -92,6 +94,7 @@ QVariant BOQTableModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
+
 bool BOQTableModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
     if(role  == Qt::EditRole && index.row() < rows){
@@ -107,10 +110,12 @@ bool BOQTableModel::setData(const QModelIndex &index, const QVariant &value, int
     }
 }
 
+
 Qt::ItemFlags BOQTableModel::flags(const QModelIndex &index) const
 {
     return Qt::ItemIsEditable | Qt::ItemIsSelectable | Qt::ItemIsEnabled;
 }
+
 
 void BOQTableModel::addToItemList(const QModelIndex &index, const QVariant &value)
 {
@@ -136,10 +141,12 @@ void BOQTableModel::addToItemList(const QModelIndex &index, const QVariant &valu
     }
 }
 
+
 bool BOQTableModel::insertRow(int row, const QModelIndex &parent)
 {
     return insertRows(row, 1, parent);
 }
+
 
 bool BOQTableModel::insertRows(int row, int count, const QModelIndex &parent)
 {
@@ -168,10 +175,12 @@ bool BOQTableModel::insertRows(int row, int count, const QModelIndex &parent)
     return false;
 }
 
+
 bool BOQTableModel::removeRow(int row, const QModelIndex &parent)
 {
     return removeRows(row, 1, parent);
 }
+
 
 bool BOQTableModel::removeRows(int row, int count, const QModelIndex &parent)
 {
@@ -190,6 +199,7 @@ bool BOQTableModel::removeRows(int row, int count, const QModelIndex &parent)
     }
     return false;
 }
+
 
 QVariant BOQTableModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
@@ -217,14 +227,17 @@ QVariant BOQTableModel::headerData(int section, Qt::Orientation orientation, int
     return QVariant();
 }
 
+
 QString BOQTableModel::toCSV()
 {
 }
+
 
 QList<BOQTableItem> * BOQTableModel::getTableData()
 {
     return pItemList;
 }
+
 
 /**
   * returns the row of the item found if an item can't be found returns -1
@@ -240,6 +253,44 @@ int BOQTableModel::rowOfItem(QString refNum)
     }
     return row;
 }
+
+
+double BOQTableModel::getTotal()
+{
+    double total = 0;
+    foreach(BOQTableItem item, *pItemList){
+        total += item.amount.toDouble();
+    }
+    return total;
+}
+
+
+QList<SummaryStruct> BOQTableModel::getSummary()
+{
+    QList<SummaryStruct> summaryList;
+    SummaryStruct summary;
+    QList<QChar> keysList = ItemHashList.uniqueKeys();
+    double subTotal;
+    QHash<QChar, BOQTableItem>::const_iterator iter;
+
+    foreach(QChar key, keysList){
+        iter = ItemHashList.find(key);
+        subTotal = 0;
+//        while (iter !=ItemHashList.end() && ( ((QChar)iter.key) == key)){
+//            subTotal += iter.value().amount.toDouble();
+//            iter++;
+//        }
+        summary.category = key;
+        summary.subTotal = subTotal;
+
+        summaryList.append(summary);
+    }
+    return summaryList;
+}
+
+
+
+
 
 
 

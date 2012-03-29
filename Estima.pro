@@ -10,59 +10,62 @@ DEPENDPATH += . addons core gui main storage
 INCLUDEPATH += . addons core storage gui main
 
 # Input
-HEADERS += addons/printview.h \
-           core/boqgenerator.h \
-           core/CoreStructures.h \
-           core/estimaEnums.h \
-           core/unitratecalculator.h \
-           core/units.h \
-           core/worksheetwidget.h \
-           gui/aboutdialog.h \
-           gui/addremoveurc.h \
-           gui/addresource.h \
-           gui/projectpropertiesform.h \
-           main/estima.h \
-           storage/dbmanager.h \
-           storage/item.h \
-           storage/mysqlconnector.h \
-           storage/sqlitedbmanager.h \
-           storage/storagemanager.h \
-           storage/xmlrenderer.h \
-           storage/xmlwriter.h \
-    core/boqdelegate.h \
-    gui/resourcedatabrowser.h \
-    core/boqtablemodel.h \
-    addons/tabledataconvertor.h \
-    gui/boqviewerdialog.h
+HEADERS +=  addons/printview.h \
+            core/boqgenerator.h \
+            core/CoreStructures.h \
+            core/estimaEnums.h \
+            core/unitratecalculator.h \
+            core/units.h \
+            core/worksheetwidget.h \
+            gui/aboutdialog.h \
+            gui/addremoveurc.h \
+            gui/addresource.h \
+            gui/projectpropertiesform.h \
+            main/estima.h \
+            storage/dbmanager.h \
+            storage/item.h \
+            storage/mysqlconnector.h \
+            storage/sqlitedbmanager.h \
+            storage/storagemanager.h \
+            storage/xmlrenderer.h \
+            storage/xmlwriter.h \
+            core/boqdelegate.h \
+            gui/resourcedatabrowser.h \
+            core/boqtablemodel.h \
+            addons/tabledataconvertor.h \
+            gui/boqviewerdialog.h \
+            gui/itemviewer.h
 
-FORMS += core/worksheetwidget.ui \
-         gui/aboutdialog.ui \
-         gui/addremoveurc.ui \
-         gui/addresource.ui \
-         gui/projectpropertiesform.ui \
-         main/mainwindow.ui \
-    gui/resourcedatabrowser.ui \
-    gui/boqviewerdialog.ui
+FORMS +=    core/worksheetwidget.ui \
+            gui/aboutdialog.ui \
+            gui/addremoveurc.ui \
+            gui/addresource.ui \
+            gui/projectpropertiesform.ui \
+            main/mainwindow.ui \
+            gui/resourcedatabrowser.ui \
+            gui/boqviewerdialog.ui \
+            gui/itemviewer.ui
 
-SOURCES += addons/printview.cpp \
-           core/boqgenerator.cpp \
-           core/unitratecalculator.cpp \
-           core/units.cpp \
-           core/worksheetwidget.cpp \
-           gui/aboutdialog.cpp \
-           gui/addremoveurc.cpp \
-           gui/addresource.cpp \
-           gui/projectpropertiesform.cpp \
-           main/estima.cpp \
-           main/main.cpp \
-           storage/dbmanager.cpp \
-           storage/mysqlconnector.cpp \
-           storage/sqlitedbmanager.cpp \
-           storage/storagemanager.cpp \
-           storage/xmlrenderer.cpp \
-           storage/xmlwriter.cpp \
-    core/boqdelegate.cpp \
-    gui/resourcedatabrowser.cpp \
-    core/boqtablemodel.cpp \
-    addons/tabledataconvertor.cpp \
-    gui/boqviewerdialog.cpp
+SOURCES +=  addons/printview.cpp \
+            core/boqgenerator.cpp \
+            core/unitratecalculator.cpp \
+            core/units.cpp \
+            core/worksheetwidget.cpp \
+            gui/aboutdialog.cpp \
+            gui/addremoveurc.cpp \
+            gui/addresource.cpp \
+            gui/projectpropertiesform.cpp \
+            main/estima.cpp \
+            main/main.cpp \
+            storage/dbmanager.cpp \
+            storage/mysqlconnector.cpp \
+            storage/sqlitedbmanager.cpp \
+            storage/storagemanager.cpp \
+            storage/xmlrenderer.cpp \
+            storage/xmlwriter.cpp \
+            core/boqdelegate.cpp \
+            gui/resourcedatabrowser.cpp \
+            core/boqtablemodel.cpp \
+            addons/tabledataconvertor.cpp \
+            gui/boqviewerdialog.cpp \
+            gui/itemviewer.cpp

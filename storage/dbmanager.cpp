@@ -20,5 +20,6 @@
 DBManager::DBManager(QObject *parent):
     QObject(parent)
 {
+
 }
 

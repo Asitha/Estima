@@ -18,7 +18,7 @@
 #ifndef BOQVIEWERDIALOG_H
 #define BOQVIEWERDIALOG_H
 
-#include "boqtablemodel.h"
+#include "core/boqtablemodel.h"
 
 #include <QTextDocument>
 #include <QDialog>
