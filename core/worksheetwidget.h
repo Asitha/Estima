@@ -48,9 +48,10 @@ public:
     ~WorkSheetWidget();
     void setStorageManager(StorageManager& pStorageManager);
     void print();
-    void saveProject();
-    void saveProjectAs();
+    bool saveProject();
+    bool saveProjectAs();
     bool setBOQData(QList<BOQTableItem> tableDataList, QString filepath = QString(""));
+    QTextDocument* createTextDocument();
 
 private slots:
 
@@ -60,12 +61,15 @@ private slots:
     void on_categoryEdit_lostFocus();
     void on_reset_Button_clicked();
     void on_ItemEdit_textEdited(const QString &arg1);
-    void showPopupMenu(QModelIndex index);
     void on_categoryEdit_editingFinished();
+    void tableClicked(QModelIndex index);
+
+    void removeSelectedRow();
+    void addRowAboveSelected();
+    void addRowBelowSelected();
 
 private:
     int indexNum;
-
     int activeRow;                              // new items are added to this row;
     QString currentSavePath;                    // wif the string is non-empty save option will save the file to this path.
     QSqlQueryModel itemModel, categoryModel;
@@ -82,8 +86,6 @@ private:
     QAction *pAddRowAboveAct ;
     QAction *pAddRowBelowAct;
     QAction *pRemoveRowAct;
-    QAction *pCutAct;
-    QAction *pPasteAct;
 
     void creatContextMenu();
     void addBOQItem(BOQItem &boqItem);
@@ -91,10 +93,8 @@ private:
     void showError(const QString errorMsg);
     void setupCompleters();
     void setupBOQTable();
-    int getActiveRow();
+    int getActiveRow(QString refNum, bool *itemExist = new bool(false));
     QVector<QTextLength>  getColumnWidthConstraints();
-    QTextDocument* createTextDocument();
-
 };
 
 #endif // WORKSHEETWIDGET_H

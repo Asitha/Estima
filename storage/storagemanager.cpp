@@ -61,6 +61,11 @@ void StorageManager::searchItem(QString description)
     pDBManager->searchItem(description);
 }
 
+void StorageManager::updateItemQueryModel(QSqlQueryModel &model, QString description)
+{
+    pDBManager->updateItemQueryModel(model, description);
+}
+
 void StorageManager::saveURC(QString fileName, const URCData &data)
 {
     pXMLRenderer->saveURC(fileName, data);

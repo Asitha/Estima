@@ -74,13 +74,13 @@ private:
     QSqlQueryModel resourceModel;
 
     Item item;
-    int firstBlankRow;
+    int activeRow;
 
     bool addToURCTable(ResourceURC rsrcData);
     void fillUIData();
     void setupCompleters();
     void setupResourceTable();
-    int rowToAdd(QString name, int duplicityChkCol = 0);
+    int rowToAdd(QString name, int duplicityChkCol = 0, bool *itemExist = new bool());
     void clearTable();
     QList<ResourceURC> getTableData();
     void ShowItemData();

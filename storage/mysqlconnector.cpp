@@ -88,6 +88,10 @@ void MySQLConnector::searchItem(QString description)
         processItems(query);
 }
 
+void MySQLConnector::updateItemQueryModel(QSqlQueryModel &model, QString description)
+{
+}
+
 
 /**
   * private member of the class to process a returned query to extrat data

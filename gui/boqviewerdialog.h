@@ -15,11 +15,36 @@
    along with Estima.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "dbmanager.h"
+#ifndef BOQVIEWERDIALOG_H
+#define BOQVIEWERDIALOG_H
 
-DBManager::DBManager(QObject *parent):
-    QObject(parent)
-{
+#include "core/boqtablemodel.h"
 
+#include <QTextDocument>
+#include <QDialog>
+
+namespace Ui {
+    class BOQViewerDialog;
 }
 
+class BOQViewerDialog : public QDialog
+{
+    Q_OBJECT
+
+public:
+    explicit BOQViewerDialog(QTextDocument *document, QWidget *parent = 0);
+    ~BOQViewerDialog();
+    void setText(QTextDocument *document);
+
+private slots:
+    void on_cancelButton_clicked();
+
+    void on_saveAsPDFButton_clicked();
+
+private:
+    QTextDocument *pDocument;
+    Ui::BOQViewerDialog *ui;
+
+};
+
+#endif // BOQVIEWERDIALOG_H

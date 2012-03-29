@@ -21,12 +21,12 @@
 
 #include <QDebug>
 
-ResourceDataBrowser::ResourceDataBrowser(StorageManager &storageManager, QWidget *parent) :
+ResourceDataBrowser::ResourceDataBrowser(StorageManager *pStorageManager, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::ResourceDataBrowser)
 {
     ui->setupUi(this);
-    this->pStorageManagerAct = &storageManager;
+    this->pStorageManagerAct = pStorageManager;
     setWindowTitle(tr("Resource Data Browser"));
 
     initActions();
@@ -90,10 +90,8 @@ void ResourceDataBrowser::removeSelectedResource()
 {
     // Even when an item is not selected this will be activated;
     QModelIndex idx = ui->tableView->selectionModel()->currentIndex();
-
-    ui->tableView->model()->removeRow(idx.row(), idx);
-
-
+    qDebug()<< idx;
+    pModel->removeRow(idx.row());
 }
 
 void ResourceDataBrowser::addNewResource()

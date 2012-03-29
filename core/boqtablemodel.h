@@ -21,8 +21,14 @@
 #include "core/CoreStructures.h"
 
 #include <QAbstractTableModel>
+#include <QHash>
+#include <QMultiHash>
 
 
+struct SummaryStruct{
+    QChar category;
+    double subTotal;
+};
 
 class BOQTableModel : public QAbstractTableModel
 {
@@ -43,14 +49,19 @@ public:
 
     QList<BOQTableItem>* getTableData();
     QString toCSV();
+    int rowOfItem(QString refNum);
+    double getTotal();
+    QList<SummaryStruct> getSummary();
 private:
     int rows;
     int columns;
+
+    QMultiHash<QChar, BOQTableItem> ItemHashList;
     QList<BOQTableItem> *pItemList;
 
     void addToItemList(const QModelIndex &index, const QVariant &value);
 signals:
-    void editCompleted(const QString &);
+
 
 public slots:
 

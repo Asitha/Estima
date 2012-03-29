@@ -31,7 +31,7 @@ class ResourceDataBrowser : public QDialog
     Q_OBJECT
 
 public:
-    explicit ResourceDataBrowser(StorageManager &pStorageManagerAct ,QWidget *parent = 0);
+    explicit ResourceDataBrowser(StorageManager *pStorageManagerAct ,QWidget *parent = 0);
     ~ResourceDataBrowser();
 
 private slots:

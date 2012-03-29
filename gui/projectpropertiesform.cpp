@@ -50,18 +50,31 @@ void ProjectPropertiesForm::on_createProjButton_clicked()
     data.preparedBy = ui->preparedByLineEdit->text();
     data.currency = ui->currencyLineEdit->text();
     data.unitSystem = ui->unitSystemComboBox->currentText();
-    data.markup = ui->markupSpinBox->value();
+    data.markup = ui->markupSpinBox->value()*0.01;
 
     emit newProjData(data);
-    }else{
-        QMessageBox::warning(this,"Invalid Information", "Invalid data entered");
     }
-
 }
 
 bool ProjectPropertiesForm::isValidInput()
 {
-    // user input needs to be validated
+    bool isValid = true;
+    QString errorString = "<h5>Following fields are empty, re enter data </h5> <ul>";
+    if(ui->projNameLineEdit->text().trimmed().isEmpty()){
+        errorString.append("<li>Project Name</li>");
+        isValid = false;
+    }
+    if(ui->referenceNumberLineEdit->text().trimmed().isEmpty()){
+        errorString.append("<li>Reference Number</li>");
+        isValid= false;
+    }
+    if(ui->currencyLineEdit->text().trimmed().isEmpty()){
+        errorString.append("<li>Curreny</li>");
+        isValid= false;
+    }
+    errorString.append("</ul>");
+    if(!isValid)
+        QMessageBox::critical(this, tr("Invalid Input"), errorString );
 
-    return true;
+    return isValid;
 }

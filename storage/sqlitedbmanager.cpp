@@ -34,6 +34,10 @@ SQLiteDBManager::SQLiteDBManager(QObject *parent) :
 
 }
 
+SQLiteDBManager::~SQLiteDBManager()
+{
+}
+
 
 /**
   * This method needs to be called before usage.
@@ -43,7 +47,9 @@ bool SQLiteDBManager::createConnection(QString username, QString passsword,QStri
 {
 
     db = QSqlDatabase::addDatabase( "QSQLITE" );
-    db.setDatabaseName( "Estima.db" );
+    QFile file();
+
+    db.setDatabaseName( "D:/Software/Project/Estima-build-desktop-Qt_4_8_0_for_Desktop_-_MinGW__Qt_SDK__Debug/estima.db" );
 
     if( !db.open() )
     {
@@ -61,15 +67,11 @@ bool SQLiteDBManager::createConnection(QString username, QString passsword,QStri
   */
 Item SQLiteDBManager::getItem(int itemID)
 {
-    QList<Item> items;
-
     QSqlQuery query;
-    if (runQuery(QString("SELECT * FROM item WHERE ID='%1'").arg(itemID), &query, true)){
-        items = processItems(query);
+    if (!runQuery(QString("SELECT * FROM item WHERE ID='%1'").arg(itemID), &query, true)){
+         qDebug() << "No item found on DB";
     }
-
-    return items.first();
-
+    return processItems(query).first();
 }
 
 
@@ -79,14 +81,14 @@ Item SQLiteDBManager::getItem(int itemID)
 Item SQLiteDBManager::getItem(QString description)
 {
     QSqlQuery query;
-    QList<Item> items;
+    QList<Item> itemList;
 
-    if(runQuery(QString("SELECT * FROM item WHERE Description='%1'").arg(description),&query, true )){
-        items = (processItems(query));
+    if(!runQuery(QString("SELECT * FROM item WHERE Description='%1'").arg(description),&query, true )){
+        qDebug() << "No item found on DB";
     }
-    return items.first();
+    itemList=  processItems(query);
+    return itemList.first();
 }
-
 
 /**
   * search for similar items with the keyword
@@ -107,16 +109,15 @@ void SQLiteDBManager::searchItem(QString description)
 QList<Item> SQLiteDBManager::processItems(QSqlQuery& query)
 {
     QList<Item> items;
-
+    QSqlRecord record = query.record();
     while (query.next()){
         Item tmpItem;
-        tmpItem.ID = query.value(0).toInt() ;
-        tmpItem.categoryID = query.value(1).toInt() ;
-//        tmpItem.formulaID = query.value(2).toInt() ;
-        tmpItem.refNum = query.value(3).toString() ;
-        tmpItem.description =  query.value(4).toString() ;
-        tmpItem.unit = query.value(5).toString() ;
-        tmpItem.dateModified = query.value(6).toString() ;
+        tmpItem.ID = query.value(record.indexOf("ID")).toInt() ;
+        tmpItem.categoryID = query.value(record.indexOf("Category_ID")).toInt() ;
+        tmpItem.refNum = query.value(record.indexOf("Reference_No")).toString() ;
+        tmpItem.description =  query.value(record.indexOf("Description")).toString() ;
+        tmpItem.unit = query.value(record.indexOf("Unit")).toString() ;
+        tmpItem.dateModified = query.value(record.indexOf("Date_Created")).toString() ;
         items.append(tmpItem);
     }
     if(items.isEmpty())
@@ -134,16 +135,18 @@ QList<Item> SQLiteDBManager::processItems(QSqlQuery& query)
   */
 QList<Item> SQLiteDBManager::getItemsof(QString category)
 {
-    // method needs to be implementded
-
+    QList<Item> itemList;
     QSqlQuery query;
-    if(runQuery(QString("SELECT * FROM category WHERE Name='%1'").arg(category), &query, true))
-    {
-        while (query.next()){
-            qDebug() << "ID" <<  query.value(0).toInt() ;
-            qDebug() << "ID" << query.value(1).toString() ;
-        }
-    }
+    QString stmt = QString("SELECT item.ID, category_ID, Formula_ID, Reference_No, Description, Unit, "
+                           "Date_Created FROM category join item WHERE category.name='%1' and "
+                           "category.ID = item.Category_ID").arg(category);
+    if(runQuery(stmt, &query, true))
+        itemList = processItems(query);
+
+    foreach(Item itm, itemList)
+        itm.category = category;
+
+    return itemList;
 }
 
 
@@ -151,37 +154,55 @@ Resource SQLiteDBManager::getResource(int ID)
 {
     QString stmt = QString("SELECT * FROM resource WHERE ID='%1'").arg(ID);
     Resource tmpResource;
-
+    tmpResource.ID = -1;
     QSqlQuery query;
 
     if(runQuery(stmt, &query, true))
     {
-
-        while(query.next()){
-            tmpResource.ID = query.value(0).toInt();
-            tmpResource.name = query.value(1).toString();
-            tmpResource.unit = query.value(2).toString();
-            tmpResource.rate = query.value(3).toFloat();
-            tmpResource.lastModified = query.value(4).toString();
-            tmpResource.type = query.value(5).toChar();
-            tmpResource.quantity = query.value(6).toFloat();
-        }
+        if(query.next())
+            tmpResource = fillResourceData(query);
     }
-
     return tmpResource;
 }
+
+void SQLiteDBManager::updateItemQueryModel(QSqlQueryModel &model,QString description)
+{
+    QString txt = QString("SELECT Description FROM item WHERE Description LIKE '\%%1\%' ").arg(description);
+    model.setQuery(txt, db);
+}
+
+
 QList<Resource> SQLiteDBManager::getResource(QString resourceName)
 {
+    QString stmt = QString("SELECT * FROM resource WHERE Name='%1'").arg(resourceName);
+    QSqlQuery query;
     QList<Resource> resourceList;
-    // implementation needed
-
+    if(runQuery(stmt, &query,true)){
+        while(query.next()){
+            resourceList.append(fillResourceData(query));
+        }
+    }
     return resourceList;
 }
 
-SQLiteDBManager::~SQLiteDBManager()
-{
 
+Resource SQLiteDBManager::fillResourceData(QSqlQuery query)
+{
+    Resource tmpResource;
+    tmpResource.ID = -1;
+    if(query.isValid()){
+        tmpResource.ID = query.value(0).toInt();
+        tmpResource.name = query.value(1).toString();
+        tmpResource.unit = query.value(2).toString();
+        tmpResource.rate = query.value(3).toFloat();
+        tmpResource.lastModified = query.value(4).toString();
+        tmpResource.type = query.value(5).toChar();
+        tmpResource.quantity = query.value(6).toFloat();
+    }
+    return tmpResource;
 }
+
+
 
 /**
   *
@@ -189,18 +210,18 @@ SQLiteDBManager::~SQLiteDBManager()
   * Prepared statements are processed using this member.
   * bind value is fed as a QString
   */
-QSqlQuery SQLiteDBManager::runPrepQuery(QString preprdStmt,QString bindValue, bool isForwardOnly)
+QSqlQuery SQLiteDBManager::runPrepQuery(QString preprdStmt,QStringList bindValues, bool isForwardOnly, bool *isSuccess)
 {
     QSqlQuery query;
     if(db.open()){
 
         query.setForwardOnly(isForwardOnly);
         query.prepare(preprdStmt);
-        query.addBindValue(bindValue);
-        //        for(int i = 0; i < bindValues.size(); i++){
-        //            query.addBindValue(bindValues.at(i));
-        //        }
-        query.exec();
+        foreach (QString str, bindValues){
+            query.addBindValue(bindValues);
+            qDebug() << str;
+        }
+        *isSuccess = query.exec();
 
     }else{
         isConnected =false;
@@ -220,7 +241,7 @@ QSqlQuery SQLiteDBManager::runPrepQuery(QString preprdStmt,QString bindValue, bo
   */
 bool SQLiteDBManager::runQuery(QString stmt, QSqlQuery *query, bool isForwardOnly)
 {
-    bool isSuccesfull;
+    bool isSuccesfull =false;
     if(db.open()){
         query->setForwardOnly(isForwardOnly);
         isSuccesfull = query->exec(stmt);
@@ -239,6 +260,30 @@ bool SQLiteDBManager::runQuery(QString stmt, QSqlQuery *query, bool isForwardOnl
 
 bool SQLiteDBManager::addResource(Resource resource)
 {
-}
+    bool isSuccess = false;
+    if(db.open()){
+        QSqlQuery query;
+        QString prepStmt = "INSERT INTO resource (ID, Name, Unit, Rate, Last_Modified, Type, Quantity, Description) "
+                "VALUES(?,?,?,?,?,?,?,?)";
 
+        query.prepare(prepStmt);
+
+        query.addBindValue(resource.ID);
+        query.addBindValue(resource.name);
+        query.addBindValue(resource.unit);
+        query.addBindValue(resource.rate);
+        query.addBindValue(resource.lastModified);
+        query.addBindValue(resource.type);
+        query.addBindValue(resource.quantity);
+        query.addBindValue(resource.description);
+
+        isSuccess = query.exec();
+//        QStringList attributList;
+//        attributList << QString(resource.ID) << resource.name << resource.unit << QString().setNum(resource.rate)   ;
+//        attributList << resource.lastModified << resource.type <<  QString().setNum(resource.quantity) << resource.description;
+
+//        runPrepQuery(prepStmt, attributList, true, &isSuccess);
+    }
+    return isSuccess;
+}
 

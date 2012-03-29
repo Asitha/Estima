@@ -36,7 +36,7 @@ QWidget * BOQDelegate::createEditor(QWidget *parent,
         editor->setValue(0);
         return editor;
     }else{
-        QLineEdit *editor = new QLineEdit(parent);
+        QPlainTextEdit *editor = new QPlainTextEdit(parent);
         return editor;
     }
 }
@@ -50,8 +50,8 @@ void BOQDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
         spinBox->setValue(value);
     }else{
         QString txt = index.model()->data(index,Qt::EditRole).toString();
-        QLineEdit *lineEdit = static_cast<QLineEdit *>(editor);
-        lineEdit->setText(txt);
+        QPlainTextEdit *plainTextEdit = static_cast<QPlainTextEdit *>(editor);
+        plainTextEdit->setPlainText(txt);
     }
 }
 
@@ -69,8 +69,8 @@ void BOQDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const
         }
     }
     else {
-        QLineEdit *lineEdit = static_cast<QLineEdit *>(editor);
-        model->setData(index, lineEdit->text(), Qt::EditRole);
+        QPlainTextEdit *plainTextEdit = static_cast<QPlainTextEdit *>(editor);
+        model->setData(index, plainTextEdit->toPlainText(), Qt::EditRole);
     }
 
 }
