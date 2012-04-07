@@ -1,0 +1,22 @@
+README for Estima - automated BOQ making software
+=================================================
+
+AUTHOR            - Asitha Nanayakkara <daun07@gmail.com> 
+
+Introduction
+============
+
+The purpose of this software is to automate the process of making Bills of Quantities (BOQ’s) in a building
+construction project. The users of this software, civil engineers, quantity surveyors, construction firms, make BOQ’s
+for a project after drawing the plan of the project. The process generally involves repetitive calculations, and
+standard calculations that can be automated. “Estima” Software solution drastically reduce the time consumed in the
+manual preparation of BOQ’s by automating the process and removing the human errors in calculations.
+
+
+Building
+========
+
+used qt creator for building. 
+
+
+*** Project is not yet complete. But main functionalities are in place. (need a bit of polishing)
